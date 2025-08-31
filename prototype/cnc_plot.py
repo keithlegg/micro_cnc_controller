@@ -14,9 +14,9 @@ class cnc_plot(object):
         self.angular_unit = 'rad'
 
         #pulses per linear unit 
-        self.pp_lux       = 10
-        self.pp_luy       = 10
-        self.pp_luz       = 10
+        self.pp_lux       = 100
+        self.pp_luy       = 100
+        self.pp_luz       = 100
         #self.pp_lui      = 10
         #self.pp_luj      = 10        
 
@@ -28,10 +28,7 @@ class cnc_plot(object):
             usage:
 
         """
-
         pts_created = []
-        #fpos=(x1, y1, z1)
-        #spos=(x2, y2, z2)
          
         for n in range(num):
             npos = [3]
@@ -46,13 +43,8 @@ class cnc_plot(object):
     ##-------------------------------------------##
     def calc_3d_pulses(self, fr_pt, to_pt):
         """ 
-            THIS IS PROBABLY STUPID AND OVERLY COMPLEX  
-            WHAT IF WE JUST CONVERTED A VECTOR INTO A LARGE INT[3] FOR EACH PULSE ?? 
-
-            create a 3D vector from two points
-            then convert that vectors into a series of X,Y,Z pulses to drive 3 servos
- 
- 
+            No idea is this is right, and probably not the best way to do this. 
+            This converts a 3D vector into a series of pulses to drive the 3 (or more?) axis servos 
         """
 
         mag = ( fr_pt.between(to_pt).length )
@@ -79,27 +71,22 @@ class cnc_plot(object):
         else:
             gran = 0
 
-        print(mag, most, gran, tmp)
-
-
         #calculate a series of points along vector for each axis 
         x_pts = self.locate_pt_along3d(to_pt, fr_pt, int(num_pul_x))
         y_pts = self.locate_pt_along3d(to_pt, fr_pt, int(num_pul_y))
         z_pts = self.locate_pt_along3d(to_pt, fr_pt, int(num_pul_z))
 
-        # print(x_pts)
-        # print(y_pts)
-        # print(z_pts)
+
+        DEBUGMODE = 0
+
         pulsetrain = []
-        
-
-        #DEBUG! :: WILDLY INEFFECIENT - IT LOOPS INSIDE ITS LOOPS!
-        #ALSO - NOT SURE THIS SOLVES THE INTIAL PROBLEM OF X,Y,Z individually instead of interpolating all at once 
-        #TODO LOOK AT BRESENHAM ?? 
-
+        # build a sampleset of all points along the vector - then iterate and match each axis to those points
+        # converting the spatial points into a pulse train 
         if most!=0 and gran!=0:
-            print('### most possible samples', most)
-            
+            if DEBUGMODE:
+                print('### most possible samples', most)
+                print(mag, most, gran, tmp)
+
             thresh = gran/2 
             samples = self.locate_pt_along3d(to_pt, fr_pt, int(most))
             for spt in samples:
@@ -107,33 +94,34 @@ class cnc_plot(object):
 
                 for xpt in x_pts:
                     if( (xpt-spt).length<thresh):
-                        print((xpt-spt).length)
-                        xp=1
+                        #print((xpt-spt).length)
+                        xp=1;break
                 for ypt in y_pts:
                     if( (ypt-spt).length<thresh ):
-                        yp=1
+                        yp=1;break
                 for zpt in z_pts:
                     if( (zpt-spt).length<thresh ):
-                        zp=1
+                        zp=1;break
 
                 pulsetrain.append([xp,yp,zp])
-                pulsetrain.append([0 ,0 ,0])
+                if not DEBUGMODE:
+                    pulsetrain.append([0 ,0 ,0])
+        
+        if DEBUGMODE:
+            xct=0;yct=0;zct=0
+            for p in pulsetrain:
+                if p[0]==1:
+                    xct+=1
+                if p[1]==1:
+                    yct+=1
+                if p[2]==1:
+                    zct+=1                                        
+            print(xct, yct, zct)
 
 
-        if 0: 
-            print(' # samples ', len(samples))
-            print(len(xpulses))
-            print(len(ypulses))
-            print(len(zpulses))
-
-        if 0:
-            print(xpulses)
-            print(ypulses)
-            print(zpulses)
-
-        for p in pulsetrain:
-            print(p)
-
+        if not DEBUGMODE:
+            for p in pulsetrain:
+                print(p)
 
 #---------------------------------#
 
@@ -141,7 +129,7 @@ plot = cnc_plot()
 
 
 x = vec3(0 ,0 ,0  )
-y = vec3(.5 ,.0 ,15  )
+y = vec3(7 ,.1 ,15  )
 
 
 
