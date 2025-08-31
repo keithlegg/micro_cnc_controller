@@ -30,21 +30,23 @@
 
 
 void pointgen::locate_pt_along3d(vector<vec3>* output,
-                                 vector<vec3>* fpos, 
-                                 vector<vec3>* spos, 
+                                 vec3 fpos, 
+                                 vec3 spos, 
                                  int num)
 {
+    
+    int n = 0;
 
-           
-            vec3 out;
-            out.x = 0; 
-            out.y = 0;
-            out.z = 0;
+    for (n=0;n<num;n++)
+    {
+        vec3 npos;
+        npos.x =  spos.x+(((fpos.x-spos.x)/(num+1))*(n+1));
+        //npos.y =  spos.y+(((fpos.y-spos.y)/(num+1))*(n+1)); 
+        //npos.z =  spos.z+(((fpos.z-spos.z)/(num+1))*(n+1));
+        output->push_back( npos );
+    }
+ 
 
-            output->push_back( out );
-            output->push_back( out );
-            output->push_back( out );
-                        
 
 };
 

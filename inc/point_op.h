@@ -28,8 +28,8 @@ class pointgen
         ~pointgen(){};
 
     void locate_pt_along3d(vector<vec3>* output,
-                           vector<vec3>* fpos, 
-                           vector<vec3>* spos, 
+                           vec3 fpos, 
+                           vec3 spos, 
                            int num);
 
 
