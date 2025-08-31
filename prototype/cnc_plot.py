@@ -14,9 +14,9 @@ class cnc_plot(object):
         self.angular_unit = 'rad'
 
         #pulses per linear unit 
-        self.pp_lux       = 100
-        self.pp_luy       = 100
-        self.pp_luz       = 100
+        self.pp_lux       = 10
+        self.pp_luy       = 10
+        self.pp_luz       = 10
         #self.pp_lui      = 10
         #self.pp_luj      = 10        
 
@@ -90,33 +90,49 @@ class cnc_plot(object):
         # print(x_pts)
         # print(y_pts)
         # print(z_pts)
-        xpulses = [] 
-        ypulses = [] 
-        zpulses = [] 
+        pulsetrain = []
         
 
         #DEBUG! :: WILDLY INEFFECIENT - IT LOOPS INSIDE ITS LOOPS!
+        #ALSO - NOT SURE THIS SOLVES THE INTIAL PROBLEM OF X,Y,Z individually instead of interpolating all at once 
+        #TODO LOOK AT BRESENHAM ?? 
+
         if most!=0 and gran!=0:
-            print('### most possible samples', int(most/gran))
-     
+            print('### most possible samples', most)
+            
+            thresh = gran/2 
             samples = self.locate_pt_along3d(to_pt, fr_pt, int(most))
             for spt in samples:
+                xp=0;yp=0;zp=0;
+
                 for xpt in x_pts:
-                    if( (xpt-spt).length<gran ):
-                        xpulses.append('+')
-
+                    if( (xpt-spt).length<thresh):
+                        print((xpt-spt).length)
+                        xp=1
                 for ypt in y_pts:
-                    if( (ypt-spt).length<gran ):
-                        ypulses.append('+')
-                
+                    if( (ypt-spt).length<thresh ):
+                        yp=1
                 for zpt in z_pts:
-                    if( (zpt-spt).length<gran ):
-                        zpulses.append('+')
+                    if( (zpt-spt).length<thresh ):
+                        zp=1
+
+                pulsetrain.append([xp,yp,zp])
+                pulsetrain.append([0 ,0 ,0])
 
 
-        print(len(xpulses))
-        print(len(ypulses))
-        print(len(zpulses))
+        if 0: 
+            print(' # samples ', len(samples))
+            print(len(xpulses))
+            print(len(ypulses))
+            print(len(zpulses))
+
+        if 0:
+            print(xpulses)
+            print(ypulses)
+            print(zpulses)
+
+        for p in pulsetrain:
+            print(p)
 
 
 #---------------------------------#
@@ -125,7 +141,7 @@ plot = cnc_plot()
 
 
 x = vec3(0 ,0 ,0  )
-y = vec3(0 ,0 ,0  )
+y = vec3(.5 ,.0 ,15  )
 
 
 
