@@ -139,7 +139,7 @@ void go_pos_x(double coord)
 }*/
 
 
-
+/*
 int main(void) 
 {
     if(ioperm(LPT1,1,1))
@@ -157,6 +157,7 @@ int main(void)
 
     return 0;
 }
+*/
 
 
 
