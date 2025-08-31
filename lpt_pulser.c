@@ -90,6 +90,9 @@ void update_pulses(void)
     printf("%lf\n", a_diff_y);
     printf("%lf\n", a_diff_z);
 
+
+
+    /*******/
     //this gets nasty fast - you need to run all three at the same time!
     //just do x for now 
     //this isnt even right because we need to bitshift each channel instead of all 8 !!
@@ -101,16 +104,8 @@ void update_pulses(void)
         sleep(pulse_del); 
     }
     
-    /*
-    for(a=0;a<a_diff_y;a++){
+    /*******/
 
-    }
-
-    for(a=0;a<a_diff_z;a++){
-
-    }*/
-    
-    ////////////////
     //presuming it all worked, update internals to show that 
     xpos = x_goal_pos;
     ypos = y_goal_pos;
