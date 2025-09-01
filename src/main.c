@@ -53,22 +53,21 @@ void test_bezier( vec3 start, vec3 ctrl1, vec3 ctrl2, vec3 end)
 void test_pt_along(void)
 {
 
-
-
     pointgen PG;
 
     vector<vec3> * ptDrawvec = &scene_drawvec3;
-    vec3 s_p = newvec3(0,0,0);
-    vec3 e_p = newvec3(1,0,0);
-
+    vec3 s_p = newvec3(0.0 ,0.0 ,0.0 );
+    vec3 e_p = newvec3(7.0 ,0.1 ,15.0);
     
-    PG.locate_pt_along3d(ptDrawvec, s_p, e_p, 4);
+    PG.locate_pt_along3d(ptDrawvec, s_p, e_p, 5);
     int a=0;
     for(a=0;a<scene_drawvec3.size();a++){
         cout<<scene_drawvec3[a].x  <<" "<<scene_drawvec3[a].y  <<" "<<scene_drawvec3[a].z   << "\n";
     } 
 
 }
+
+
 
 
 /************/
@@ -82,9 +81,14 @@ int main(int argc, char **argv)
         vec3 n = normalize(cross(a,b));
     */
 
+
+    cnc_plot plot;
     
-    test_pt_along();
-    
+    vec3 s_p = newvec3(0.0 ,0.0 ,0.0 );
+    vec3 e_p = newvec3(1.0 ,0.0 ,0.0);
+    plot.calc_3d_pulses(s_p, e_p);
+
+
     cout<<"all good\n";
 
     return 0;

@@ -23,6 +23,7 @@
 #include "math_op.h"
 #include "point_op.h"
 
+#include <iostream>
 
 
 
@@ -40,10 +41,36 @@ void pointgen::locate_pt_along3d(vector<vec3>* output,
     for (n=0;n<num;n++)
     {
         vec3 npos;
-        npos.x =  spos.x+(((fpos.x-spos.x)/(num+1))*(n+1));
-        //npos.y =  spos.y+(((fpos.y-spos.y)/(num+1))*(n+1)); 
-        //npos.z =  spos.z+(((fpos.z-spos.z)/(num+1))*(n+1));
+
+        //X
+        if(fpos.x-spos.x!=0)
+        {
+            npos.x =  spos.x+(((fpos.x-spos.x)/(num+1))*(n+1));
+        }else{
+            npos.x=0;
+        }
+ 
+        //Y
+        if (fpos.y-spos.y!=0)
+        { 
+            npos.y =  spos.y+(((fpos.y-spos.y)/(num+1))*(n+1)); 
+        }else{
+            npos.y=0;
+        }
+
+        //Z
+        if (fpos.z-spos.z!=0)
+        { 
+            npos.z =  spos.z+(((fpos.z-spos.z)/(num+1))*(n+1));
+        }else{
+            npos.z=0;            
+        }
+
+        cout << n << " "<< npos.x <<" "<<npos.y<<" "<< npos.z<<"\n";
+
         output->push_back( npos );
+        //output->insert( npos );
+
     }
  
 

@@ -1,7 +1,10 @@
+
+#include <iostream>
+#include <algorithm>
+
 #include <stdio.h>
 #include <unistd.h> //sleep()
 #include <sys/io.h> //outb() ioperm()
-
 
 #define LPT1 0xc010
 //#define LPT1 0x0378
@@ -10,6 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
+#include "cnc_plot.h"
 
 
 
@@ -43,34 +48,120 @@ double z_goal_pos  = 0;
 #include "point_op.h"
 
 
-/*
 
-
-
-    def __init__(self):
-        self.head_pos     = [0,0,0]
-        self.next_pt      = [0,0,0]
-
-        self.linear_unit  = 'inch'
-        self.angular_unit = 'rad'
-
-        #pulses per linear unit 
-        self.pp_lux       = 100
-        self.pp_luy       = 100
-        self.pp_luz       = 100
-        #self.pp_lui      = 10
-        #self.pp_luj      = 10   
-*/        
-
-
-
-
-
-void cnc_plot(void)
-{
-
+std::vector<int> my_sort(const std::vector<int>& v) {
+      auto result = v; // passing v by value and returning it defeats NRVO
+      std::sort(result.begin(), result.end());
+      return result;
 }
 
+void cnc_plot::calc_3d_pulses(vec3 fr_pt, 
+                              vec3 to_pt)
+{
+
+            pointgen PG;
+
+            int pp_lux      = 100;
+            int pp_luy      = 100;
+            int pp_luz      = 100;
+        
+            vec3 between   = sub(fr_pt, to_pt);
+            double mag     = length(between);
+            double gran    = 0;  //granularity 
+            double thresh  = 0;  //threshold 
+
+            //cout << mag <<"\n";
+
+            double delta_x = fr_pt.x-to_pt.x;
+            double delta_y = fr_pt.y-to_pt.y;
+            double delta_z = fr_pt.z-to_pt.z;
+
+
+            int num_pul_x = abs(delta_x)*pp_lux;
+            int num_pul_y = abs(delta_y)*pp_luy;
+            int num_pul_z = abs(delta_z)*pp_luz;
+
+            // get the highest number of pulses to calculate 
+            int tmp[] = {num_pul_x, num_pul_y, num_pul_z};
+            //cout << "before: "<<tmp[0] << " "<< tmp[1] <<" "<< tmp[2] <<"\n";
+            std::sort(std::begin(tmp), std::end(tmp)  );
+            cout << "after: "<<tmp[0] << " "<< tmp[1] <<" "<< tmp[2] <<"\n";
+
+            int most = tmp[2];
+
+            // get the smallest division to use as granularity 
+            if (mag!=0 && most !=0)
+            {
+                gran = (mag/most);
+            }else{
+                gran = 0;
+            }
+ 
+            vector<vec3>  x_pts;
+            vector<vec3>  y_pts;
+            vector<vec3>  z_pts;
+
+            vector<vec3> * pt_xpts = &x_pts;
+            vector<vec3> * pt_ypts = &y_pts;
+            vector<vec3> * pt_zpts = &z_pts;
+
+            vector<vec3> * samples;
+            
+            //cout << "# num pulses " << num_pul_x <<" "<<num_pul_y<<" "<<num_pul_z <<"\n";
+
+            // calculate a series of points along vector for each axis 
+            if(num_pul_x!=0)
+            {
+                PG.locate_pt_along3d(pt_xpts, to_pt, fr_pt, num_pul_x);
+            }
+            if(num_pul_y!=0) 
+            {
+                PG.locate_pt_along3d(pt_ypts, to_pt, fr_pt, num_pul_y);
+            }
+            if(num_pul_z!=0)
+            {            
+                PG.locate_pt_along3d(pt_zpts, to_pt, fr_pt, num_pul_z);
+            }
+            
+
+            vector<vec3> * pulsetrain;
+ 
+      
+            //# build a sampleset of all points along the vector - then iterate and match each axis to those points
+            //# converting the spatial points into a pulse train 
+            if (most!=0 && gran!=0)
+            {
+                //if DEBUGMODE:
+                //    print('### most possible samples', most)
+                //    print(mag, most, gran, tmp)
+
+                thresh = gran/2;
+                
+                //PG.locate_pt_along3d(samples, to_pt, fr_pt, most);
+
+                /*
+                for spt in samples:
+                    xp=0;yp=0;zp=0;
+
+                    for xpt in x_pts:
+                        if( (xpt-spt).length<thresh):
+                            #print((xpt-spt).length)
+                            xp=1;break
+                    for ypt in y_pts:
+                        if( (ypt-spt).length<thresh ):
+                            yp=1;break
+                    for zpt in z_pts:
+                        if( (zpt-spt).length<thresh ):
+                            zp=1;break
+
+                    pulsetrain.append([xp,yp,zp])
+                    if not DEBUGMODE:
+                        pulsetrain.append([0 ,0 ,0])
+                */
+           }
+
+
+}
 
 
 

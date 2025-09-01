@@ -23,17 +23,14 @@ CFLAGS   = -I$(INCDIR) -w
 LINKER   = g++
 
 # linking flags 
-ifeq ($(UNAME), Linux)
-    #LINUX
-    #g++ $(OBJ) -o pulser $(INC) $(MOAR) -lX11 -lXi -lglut -lGL -lGLU -lm -lz -lpng 
-	
-	# LFLAGS   = -Wall -lglut -lGL -lGLU -lX11 -lXi  -lm -lz 
-	LFLAGS   = -Wall -lglut -lGL -lGLU -lX11  -lm -lz 
 
+#Linux
+ifeq ($(UNAME), Linux)
+	LFLAGS   = -g -Wall -lglut -lGL -lGLU -lX11  -lm -lz 
 endif
 
+#OSX
 ifeq ($(UNAME), Darwin)
-    #OSX
 	LFLAGS   = -Wall -lm -lz -framework Glut -framework OpenGL
 endif
 
