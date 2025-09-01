@@ -8,7 +8,7 @@ Those pulses then are sent to a parallel port, or PCI parallel interface.
 
 
 TODO:
-    it currently only flashes all 8 bits ON or OFF. I need to bitchift the port to control single pins/channels/axes.
+    it currently only flashes all 8 bits ON or OFF. I need to bitshift the port to control single pins/channels/axes.
 
 
 

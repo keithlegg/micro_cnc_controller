@@ -14,14 +14,6 @@
 #include "math_op.h"
 #include "point_op.h"
 
-
-//pulses per linear unit 
-const unsigned int pp_lux = 10;
-const unsigned int pp_luy = 10;
-const unsigned int pp_luz = 10;
-//const unsigned int pp_lui = 10;
-//const unsigned int pp_luj = 10;
-
 const double pulse_del = .01;
 
 double xpos = 0;
@@ -52,7 +44,7 @@ std::vector<int> my_sort(const std::vector<int>& v) {
 void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
 {
 
-    int send_it = 0; 
+    int send_it = 1; 
 
     cout << "# we have pulses! count: " << pt_pulsetrain->size() << "\n";
 
@@ -60,7 +52,7 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
     {
         if(ioperm(LPT1,1,1))
         { 
-            fprintf(stderr, "Couldn't open parallel port"), exit(1);
+            fprintf(stderr, "# Couldn't open parallel port \n"), exit(1);
         
         }
     }
@@ -68,7 +60,7 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
 
     if(send_it==1)
     {
-        cout << "transmitting pulses to LPT port \n";
+        cout << "# transmitting pulses to LPT port \n";
     }
 
     int x=0;
@@ -81,7 +73,28 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
 
         if(send_it==1)
         {
-            outb(255,LPT1);  //set all pins hi
+            //X channel 
+            if(pt_pulsetrain->at(x).x==1){
+                outb(255,LPT1);  //set all pins hi
+            }else{
+                outb(0  ,LPT1);  //set all pins low                
+            }
+            
+            /*
+            //Y channel
+            if(pt_pulsetrain->at(x).y==1){
+                outb(255,LPT1);  //set all pins hi
+            }else{
+                outb(0  ,LPT1);  //set all pins low                
+            }
+
+            //Z channel
+            if(pt_pulsetrain->at(x).z==1){
+                outb(255,LPT1);  //set all pins hi
+            }else{
+                outb(0  ,LPT1);  //set all pins low                
+            }*/
+
             sleep(pulse_del); 
         }
 
@@ -106,9 +119,10 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
 
             pointgen PG;
 
-            int pp_lux      = 100;
-            int pp_luy      = 100;
-            int pp_luz      = 100;
+            //pulses per linear unit - X,Y,Z unit prescaler 
+            int pp_lux      = 10;
+            int pp_luy      = 10;
+            int pp_luz      = 10;
         
             vec3 between   = sub(fr_pt, to_pt);
             double mag     = length(between);
