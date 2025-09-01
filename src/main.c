@@ -83,11 +83,19 @@ int main(int argc, char **argv)
 
 
     cnc_plot plot;
-    
-    vec3 s_p = newvec3(0.0 ,0.0   ,0.0 );
-    vec3 e_p = newvec3(1.0 ,-70.0 ,0.0);
-    plot.calc_3d_pulses(s_p, e_p);
 
+    vector<vec3> pulsetrain;
+    vector<vec3>* pt_pulsetrain = &pulsetrain; 
+
+    vec3 s_p = newvec3(0.0 , 0.0   ,0.0 );
+    vec3 e_p = newvec3(1.0 , 0.5 ,0.0);
+    plot.calc_3d_pulses(pt_pulsetrain, s_p, e_p);
+
+    int x=0;
+    for(x=0;x<pulsetrain.size();x++)
+    {
+        cout<<pulsetrain[x].x  <<" "<<pulsetrain[x].y  <<" "<<pulsetrain[x].z   << "\n";        
+    }
 
     cout<<"all good\n";
 

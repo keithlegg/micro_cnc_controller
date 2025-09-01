@@ -3,7 +3,9 @@ drank too much coffee - wanted to code the smallest parport cnc controller
 
 
 This is a mock up both in python and C. It translates a 3D vector into a series of pulses in X,Y,Z. 
-Those pulses then are sent to a parallel port, or PCI parallel insteface. 
+Those pulses then are sent to a parallel port, or PCI parallel interface. 
+
+
 
 The bits on the port correspond to the CNC4PC breakout board that I enojoy using because its rleatively cheap and works well.
 

@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 #include <stdio.h>
 #include <unistd.h> //sleep()
@@ -35,12 +36,9 @@ double zpos = 0;
 //double ipos = 0;
 //double jpos = 0;
 
-
 double x_goal_pos  = 0;
 double y_goal_pos  = 0;
 double z_goal_pos  = 0;
-//double i_goal_pos = 0;
-//double j_goal_pos = 0;
 
 
 
@@ -48,14 +46,17 @@ double z_goal_pos  = 0;
 #include "point_op.h"
 
 
-
+/*
 std::vector<int> my_sort(const std::vector<int>& v) {
       auto result = v; // passing v by value and returning it defeats NRVO
       std::sort(result.begin(), result.end());
       return result;
 }
+*/
 
-void cnc_plot::calc_3d_pulses(vec3 fr_pt, 
+
+void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
+                              vec3 fr_pt, 
                               vec3 to_pt)
 {
 
@@ -122,10 +123,6 @@ void cnc_plot::calc_3d_pulses(vec3 fr_pt,
             {            
                 PG.locate_pt_along3d(pt_zpts, to_pt, fr_pt, num_pul_z);
             }
-            
-
-            vector<vec3> pulsetrain;
-            vector<vec3>* pt_pulsetrain = &pulsetrain; 
       
             //# build a sampleset of all points along the vector - then iterate and match each axis to those points
             //# converting the spatial points into a pulse train 
@@ -139,31 +136,60 @@ void cnc_plot::calc_3d_pulses(vec3 fr_pt,
                 
                 PG.locate_pt_along3d(pt_samples, to_pt, fr_pt, most);
                 
-                int a=0;
-                for(a=0;a<samples.size();a++){
-                    cout<<samples[a].x  <<" "<<samples[a].y  <<" "<<samples[a].z   << "\n";
+                int a=0;int i=0;
+                //for(a=0;a<samples.size();a++){
+                //    cout<<samples[a].x  <<" "<<samples[a].y  <<" "<<samples[a].z   << "\n";
+                //}
+
+                for(a=0;a<samples.size();a++)
+                {
+                    
+                    vec3 spt = samples[a]; 
+                    int xp=0;int yp=0;int zp=0;
+                    
+
+                    //X 
+                    for (i=0;i<x_pts.size();i++)
+                    {
+                        vec3 xpt = x_pts[i];
+                        vec3 ss = sub(xpt,spt);
+                        if( length(ss)<thresh)
+                        {
+                            xp=1;
+                            break;
+                        }
+                    }
+
+                    //Y
+                    for (i=0;i<y_pts.size();i++)
+                    {
+                        vec3 ypt = y_pts[i];
+                        vec3 ss = sub(ypt,spt);
+                        if( length(ss)<thresh)
+                        {
+                            yp=1;
+                            break;
+                        }
+                    }
+
+
+                    //Z
+                    for (i=0;i<z_pts.size();i++)
+                    {
+                        vec3 zpt = z_pts[i];
+                        vec3 ss = sub(zpt,spt);
+                        if( length(ss)<thresh)
+                        {
+                            zp=1;
+                            break;
+                        }
+                    }
+
+                    pt_pulsetrain->push_back( newvec3(xp,yp,zp));
+                    pt_pulsetrain->push_back(newvec3(0,0,0));
                 }
+             
 
-
-                /* 
-                for spt in samples:
-                    xp=0;yp=0;zp=0;
-
-                    for xpt in x_pts:
-                        if( (xpt-spt).length<thresh):
-                            #print((xpt-spt).length)
-                            xp=1;break
-                    for ypt in y_pts:
-                        if( (ypt-spt).length<thresh ):
-                            yp=1;break
-                    for zpt in z_pts:
-                        if( (zpt-spt).length<thresh ):
-                            zp=1;break
-
-                    pulsetrain.append([xp,yp,zp])
-                    if not DEBUGMODE:
-                        pulsetrain.append([0 ,0 ,0])
-                */
            }
 
 
