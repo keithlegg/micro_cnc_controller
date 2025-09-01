@@ -44,23 +44,27 @@ void cnc_plot::test_port(void)
     
     }
 
-    outb(0x00,LPT1); 
-    char foo = 0x80; 
+    unsigned char foo = 0x01; 
 
- 
+    outb(0x00,LPT1); 
+    outb(foo,LPT1); 
+    sleep(1); 
 
     int a=0;int b=0;
 
-    for(b<0;b<10;b++)
+    for(b<0;b<4;b++)
     {
-        char foo = 0x80; 
-        outb(foo,LPT1);
 
         for(a<0;a<8;a++)
         {
-            outb(foo,LPT1); 
+
+            foo = foo << 1;
+            outb(foo,LPT1);
             sleep(1); 
-            foo>>1;
+
+            outb(0x00,LPT1); 
+            sleep(1); 
+
         }
     }
 
