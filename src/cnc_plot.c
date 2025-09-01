@@ -54,7 +54,6 @@ void cnc_plot::test_port(void)
 
     for(b<0;b<4;b++)
     {
-
         for(a<0;a<8;a++)
         {
 
@@ -64,8 +63,10 @@ void cnc_plot::test_port(void)
 
             outb(0x00,LPT1); 
             sleep(1); 
-
         }
+        
+        foo = 0x01; 
+
     }
 
 }
