@@ -62,9 +62,9 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
 
             pointgen PG;
 
-            int pp_lux      = 10;
-            int pp_luy      = 10;
-            int pp_luz      = 10;
+            int pp_lux      = 100;
+            int pp_luy      = 100;
+            int pp_luz      = 100;
         
             vec3 between   = sub(fr_pt, to_pt);
             double mag     = length(between);
