@@ -47,25 +47,22 @@ void cnc_plot::test_port(void)
     unsigned char foo = 0x00; 
     int a=0;int b=0;
 
-    outb(foo,LPT1); 
-    usleep(500000); 
-
-    for(b<0;b<4;b++)
-    {
+    outb(0x00,LPT1); 
+    //for(b=0;b<4;b++)
+    //{
         foo = 0x01;
-        outb(foo,LPT1);        
-        usleep(500000); 
-
         for(a<0;a<8;a++)
         {
-            outb(0x00,LPT1); 
-            usleep(500000); 
-
-            foo = foo << 1;
             outb(foo,LPT1);
             usleep(500000); 
+                       
+            outb(0x00,LPT1); 
+            usleep(500000); 
+            foo = foo << 1;
+            cout << foo <<"\n";
+            
         }
-    }
+    //}
 
 }
 
