@@ -84,8 +84,8 @@ int main(int argc, char **argv)
 
     cnc_plot plot;
     
-    vec3 s_p = newvec3(0.0 ,0.0 ,0.0 );
-    vec3 e_p = newvec3(1.0 ,0.0 ,0.0);
+    vec3 s_p = newvec3(0.0 ,0.0   ,0.0 );
+    vec3 e_p = newvec3(1.0 ,-70.0 ,0.0);
     plot.calc_3d_pulses(s_p, e_p);
 
 

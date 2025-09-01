@@ -61,9 +61,9 @@ void cnc_plot::calc_3d_pulses(vec3 fr_pt,
 
             pointgen PG;
 
-            int pp_lux      = 100;
-            int pp_luy      = 100;
-            int pp_luz      = 100;
+            int pp_lux      = 10;
+            int pp_luy      = 10;
+            int pp_luz      = 10;
         
             vec3 between   = sub(fr_pt, to_pt);
             double mag     = length(between);
@@ -85,8 +85,7 @@ void cnc_plot::calc_3d_pulses(vec3 fr_pt,
             int tmp[] = {num_pul_x, num_pul_y, num_pul_z};
             //cout << "before: "<<tmp[0] << " "<< tmp[1] <<" "<< tmp[2] <<"\n";
             std::sort(std::begin(tmp), std::end(tmp)  );
-            cout << "after: "<<tmp[0] << " "<< tmp[1] <<" "<< tmp[2] <<"\n";
-
+            //cout << "after: "<<tmp[0] << " "<< tmp[1] <<" "<< tmp[2] <<"\n";
             int most = tmp[2];
 
             // get the smallest division to use as granularity 
@@ -97,15 +96,16 @@ void cnc_plot::calc_3d_pulses(vec3 fr_pt,
                 gran = 0;
             }
  
-            vector<vec3>  x_pts;
-            vector<vec3>  y_pts;
-            vector<vec3>  z_pts;
+            vector<vec3> x_pts;
+            vector<vec3> y_pts;
+            vector<vec3> z_pts;
+            vector<vec3> samples;
 
-            vector<vec3> * pt_xpts = &x_pts;
-            vector<vec3> * pt_ypts = &y_pts;
-            vector<vec3> * pt_zpts = &z_pts;
+            vector<vec3>* pt_xpts    = &x_pts;
+            vector<vec3>* pt_ypts    = &y_pts;
+            vector<vec3>* pt_zpts    = &z_pts;
+            vector<vec3>* pt_samples = &samples;
 
-            vector<vec3> * samples;
             
             //cout << "# num pulses " << num_pul_x <<" "<<num_pul_y<<" "<<num_pul_z <<"\n";
 
@@ -124,8 +124,8 @@ void cnc_plot::calc_3d_pulses(vec3 fr_pt,
             }
             
 
-            vector<vec3> * pulsetrain;
- 
+            vector<vec3> pulsetrain;
+            vector<vec3>* pt_pulsetrain = &pulsetrain; 
       
             //# build a sampleset of all points along the vector - then iterate and match each axis to those points
             //# converting the spatial points into a pulse train 
@@ -137,9 +137,15 @@ void cnc_plot::calc_3d_pulses(vec3 fr_pt,
 
                 thresh = gran/2;
                 
-                //PG.locate_pt_along3d(samples, to_pt, fr_pt, most);
+                PG.locate_pt_along3d(pt_samples, to_pt, fr_pt, most);
+                
+                int a=0;
+                for(a=0;a<samples.size();a++){
+                    cout<<samples[a].x  <<" "<<samples[a].y  <<" "<<samples[a].z   << "\n";
+                }
 
-                /*
+
+                /* 
                 for spt in samples:
                     xp=0;yp=0;zp=0;
 

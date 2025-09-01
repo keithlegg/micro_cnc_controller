@@ -66,7 +66,7 @@ void pointgen::locate_pt_along3d(vector<vec3>* output,
             npos.z=0;            
         }
 
-        cout << n << " "<< npos.x <<" "<<npos.y<<" "<< npos.z<<"\n";
+        //cout << n << " "<< npos.x <<" "<<npos.y<<" "<< npos.z<<"\n";
 
         output->push_back( npos );
         //output->insert( npos );
