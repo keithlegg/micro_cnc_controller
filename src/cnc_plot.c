@@ -35,6 +35,37 @@ std::vector<int> my_sort(const std::vector<int>& v) {
 */
 
 
+
+void cnc_plot::test_port(void)
+{
+    if(ioperm(LPT1,1,1))
+    { 
+        fprintf(stderr, "# Couldn't open parallel port \n"), exit(1);
+    
+    }
+
+    outb(0x00,LPT1); 
+    char foo = 0x80; 
+
+ 
+
+    int a=0;int b=0;
+
+    for(b<0;b<10;b++)
+    {
+        char foo = 0x80; 
+        outb(foo,LPT1);
+
+        for(a<0;a<8;a++)
+        {
+            outb(foo,LPT1); 
+            sleep(1); 
+            foo>>1;
+        }
+    }
+
+}
+
 /******************************************/
 /*
     take the output of calc_3d_pulses() and send the signals to the parallel port 

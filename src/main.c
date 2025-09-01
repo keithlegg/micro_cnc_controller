@@ -106,8 +106,10 @@ int main(int argc, char **argv)
         vec3 n = normalize(cross(a,b));
     */
 
-
-    test_cncplot();
+    cnc_plot cnc;
+    cnc.test_port();
+    
+    //test_cncplot();
     //cout<<"all good\n";
 
     return 0;
