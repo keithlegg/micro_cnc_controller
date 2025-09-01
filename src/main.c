@@ -80,11 +80,17 @@ void test_cncplot(void)
     vec3 e_p = newvec3(1.0 , 0.5 ,0.0);
     plot.calc_3d_pulses(pt_pulsetrain, s_p, e_p);
 
+    /*
     int x=0;
     for(x=0;x<pulsetrain.size();x++)
     {
         cout<<pulsetrain[x].x  <<" "<<pulsetrain[x].y  <<" "<<pulsetrain[x].z   << "\n";        
-    }
+    }*/
+
+
+    //hopefully, we have pulses - light em up!
+    plot.send_pulses(pt_pulsetrain);
+
 
 }
 
