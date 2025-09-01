@@ -5,6 +5,9 @@
 #include <sys/io.h> //outb() ioperm()
 #include <stdlib.h>
 #include <math.h>
+#include <iomanip>
+
+#define HEX(x) setw(2) << setfill('0') << hex << (int)( x )
 
 #include <iostream>
 #include <algorithm>
@@ -59,8 +62,8 @@ void cnc_plot::test_port(void)
             outb(0x00,LPT1); 
             usleep(500000); 
             foo = foo << 1;
-            cout << foo <<"\n";
-            
+            cout <<"bit "<< a <<" value: "<< HEX(foo) <<"\n";
+
         }
     //}
 
