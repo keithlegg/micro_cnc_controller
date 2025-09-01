@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <cstring>
 
 
 //#include "gl_setup.h"     // common to all - moved to reduce size 
@@ -49,7 +50,8 @@ void test_bezier( vec3 start, vec3 ctrl1, vec3 ctrl2, vec3 end)
 }
 
 
-/************/
+/******************************************/
+
 void test_pt_along(void)
 {
 
@@ -67,7 +69,7 @@ void test_pt_along(void)
 
 }
 
-
+/******************************************/
 
 void test_cncplot(void)
 {
@@ -94,8 +96,72 @@ void test_cncplot(void)
 
 }
 
+/******************************************/
 
-/************/
+void run_cncplot(double f_x,
+                 double f_y,
+                 double f_z,
+                 double s_x,
+                 double s_y,
+                 double s_z,
+                 int divs)  
+{
+    cnc_plot plot;
+
+    bool DEBUG = true; 
+
+    vector<vec3> pulsetrain;
+    vector<vec3>* pt_pulsetrain = &pulsetrain; 
+
+    vec3 s_p = newvec3(f_x , f_y ,f_z );
+    vec3 e_p = newvec3(s_x , s_y ,s_z );
+
+    plot.calc_3d_pulses(pt_pulsetrain, s_p, e_p);
+
+    if(DEBUG==true)
+    {
+        int x=0;
+        for(x=0;x<pulsetrain.size();x++)
+        {
+            cout<<pulsetrain[x].x  <<" "<<pulsetrain[x].y  <<" "<<pulsetrain[x].z   << "\n";        
+        } 
+    }
+
+    if(DEBUG==false)
+    {
+        plot.send_pulses(pt_pulsetrain);
+    }
+
+}
+
+/******************************************/
+
+void parse_args(int argc, char **argv)
+{
+    if (argc < 8){
+        cout << "Usage: pulser X1 Y1 Z1 X2 Y2 Z2 divs \n";
+        abort();
+
+    }
+
+    
+    /***************************/
+    /*
+    //defualt scan mode
+    strcpy(scanmode, "scan");
+    if( strcmp(argv[1], scanmode) == 0)
+    {
+        //if (argc !=5){
+        //     abort_("\nUsage: scan_fids scan <file in> <coarse> <max> ");
+        //}
+    }*/
+
+
+}
+
+
+/******************************************/
+/******************************************/
 
 int main(int argc, char **argv) 
 {  
@@ -106,11 +172,27 @@ int main(int argc, char **argv)
         vec3 n = normalize(cross(a,b));
     */
 
-    cnc_plot cnc;
-    cnc.test_port();
+
+    //cnc_plot cnc;
+    //cnc.test_port();
+
+    //parse_args(argc, argv); 
     
+    double a1 = atof(argv[1]);
+    double a2 = atof(argv[2]);
+    double a3 = atof(argv[3]);
+    double a4 = atof(argv[4]);
+    double a5 = atof(argv[5]);
+    double a6 = atof(argv[6]);
+    int a7    = atoi(argv[7]);
+          
+    //cout << "# args are: "a1 << " "  << a2 << " " << a3 << " " << a4 << " " << a5 << " " << a6 << " " << a7 << " " ;
+                
+    run_cncplot( a1, a2, a3, a4, a5, a6, a7 );
+
     //test_cncplot();
     //cout<<"all good\n";
+
 
     return 0;
 }
