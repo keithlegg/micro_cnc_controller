@@ -20,7 +20,8 @@ class cnc_plot
 
     void calc_3d_pulses(vector<vec3>* pt_pulsetrain,
                         vec3 fr_pt, 
-                        vec3 to_pt);
+                        vec3 to_pt,
+                        int numdivs);
 
     void send_pulses(vector<vec3>* pt_pulsetrain);
 

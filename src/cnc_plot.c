@@ -148,40 +148,48 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
 
 void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
                               vec3 fr_pt, 
-                              vec3 to_pt)
+                              vec3 to_pt,
+                              int numdivs)
 {
 
             pointgen PG;
 
-            //pulses per linear unit - X,Y,Z unit prescaler 
-            int pp_lux      = 10;
-            int pp_luy      = 10;
-            int pp_luz      = 10;
-        
+            //set the pulses per linear unit (spatial unit divions) - X,Y,Z unit prescaler 
+            //for now use one number for all 3 - we will add the others in later
+            // int pp_lux      = 10;
+            // int pp_luy      = 10;
+            // int pp_luz      = 10;
+            int pp_lux      = numdivs;
+            int pp_luy      = numdivs;
+            int pp_luz      = numdivs;
+
+         
+            //set up variables to do vector-y stuff
             vec3 between   = sub(fr_pt, to_pt);
             double mag     = length(between);
             double gran    = 0;  //granularity 
             double thresh  = 0;  //threshold 
-
             //cout << mag <<"\n";
 
+            //calculate the absolute change for each axis  
             double delta_x = fr_pt.x-to_pt.x;
             double delta_y = fr_pt.y-to_pt.y;
             double delta_z = fr_pt.z-to_pt.z;
 
-
+            //use the total change to calculate the maximum possible pulses for each axis
             int num_pul_x = abs(delta_x)*pp_lux;
             int num_pul_y = abs(delta_y)*pp_luy;
             int num_pul_z = abs(delta_z)*pp_luz;
+            //cout << "# num pulses " << num_pul_x <<" "<<num_pul_y<<" "<<num_pul_z <<"\n";
 
-            // get the highest number of pulses to calculate 
+            // get the absolute highest number of pulses (on any axis) to calculate 
             int tmp[] = {num_pul_x, num_pul_y, num_pul_z};
             //cout << "before: "<<tmp[0] << " "<< tmp[1] <<" "<< tmp[2] <<"\n";
             std::sort(std::begin(tmp), std::end(tmp)  );
             //cout << "after: "<<tmp[0] << " "<< tmp[1] <<" "<< tmp[2] <<"\n";
             int most = tmp[2];
-
-            // get the smallest division to use as granularity 
+                                 
+            // get the smallest division to use for sampling (granularity) 
             if (mag!=0 && most !=0)
             {
                 gran = (mag/most);
@@ -189,18 +197,18 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
                 gran = 0;
             }
  
+            //make some storage for the data to work in 
             vector<vec3> x_pts;
             vector<vec3> y_pts;
             vector<vec3> z_pts;
             vector<vec3> samples;
 
+            //make some pointers to those data.
+            //(people who say THOSE data are technically correct, but they are pedantic dillholes) 
             vector<vec3>* pt_xpts    = &x_pts;
             vector<vec3>* pt_ypts    = &y_pts;
             vector<vec3>* pt_zpts    = &z_pts;
             vector<vec3>* pt_samples = &samples;
-
-            
-            //cout << "# num pulses " << num_pul_x <<" "<<num_pul_y<<" "<<num_pul_z <<"\n";
 
             // calculate a series of points along vector for each axis 
             if(num_pul_x!=0)
@@ -220,19 +228,12 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
             //# converting the spatial points into a pulse train 
             if (most!=0 && gran!=0)
             {
-                //if DEBUGMODE:
-                //    print('### most possible samples', most)
-                //    print(mag, most, gran, tmp)
-
+                //take the smallest possible sample.. and cut it in half for good measure
                 thresh = gran/2;
                 
                 PG.locate_pt_along3d(pt_samples, to_pt, fr_pt, most);
                 
                 int a=0;int i=0;
-                //for(a=0;a<samples.size();a++){
-                //    cout<<samples[a].x  <<" "<<samples[a].y  <<" "<<samples[a].z   << "\n";
-                //}
-
                 for(a=0;a<samples.size();a++)
                 {
                     
@@ -277,7 +278,7 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
                         }
                     }
 
-                    pt_pulsetrain->push_back( newvec3(xp,yp,zp));
+                    pt_pulsetrain->push_back(newvec3(xp,yp,zp));
                     pt_pulsetrain->push_back(newvec3(0,0,0));
                 }
              

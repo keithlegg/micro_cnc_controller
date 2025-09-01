@@ -6,38 +6,33 @@
 #include <cstring>
 
 
-//#include "gl_setup.h"     // common to all - moved to reduce size 
 
 #include "math_op.h"        // general math operations
 #include "point_op.h"         
 #include "cnc_plot.h"         
 
+//#include "gl_setup.h"     // common to all - moved to reduce size 
+//char* obj_filepath;  
 
 
-char* obj_filepath;  
-
-
-
+/*
 vector<vec3> scene_drawvec3;
 vector<vec3> scene_drawvecclr;   
-
 int num_drawvec3; 
-
 
 void test_bezier( vec3 start, vec3 ctrl1, vec3 ctrl2, vec3 end)
 {
-    /*
-    USAGE:
-
-    vec3 start = newvec3(0.0 ,3.0 ,1.0 );
-    vec3 ctrl1 = newvec3(2.5  ,0.0 ,0.0 );
-    vec3 ctrl2 = newvec3(0.0 ,1.0  ,0.0 );
-    vec3 end   = newvec3(-1.0 ,0.0 ,-5.0 );
-    test_bezier(start, ctrl1, ctrl2, end);
-    int a=0;
-    for(a=0;a<scene_drawvec3.size();a++){
-        cout<<scene_drawvec3[a].x  <<" "<<scene_drawvec3[a].y  <<" "<<scene_drawvec3[a].z   << "\n";
-    }*/
+    
+    // USAGE:
+    // vec3 start = newvec3(0.0 ,3.0 ,1.0 );
+    // vec3 ctrl1 = newvec3(2.5  ,0.0 ,0.0 );
+    // vec3 ctrl2 = newvec3(0.0 ,1.0  ,0.0 );
+    // vec3 end   = newvec3(-1.0 ,0.0 ,-5.0 );
+    // test_bezier(start, ctrl1, ctrl2, end);
+    // int a=0;
+    // for(a=0;a<scene_drawvec3.size();a++){
+    //     cout<<scene_drawvec3[a].x  <<" "<<scene_drawvec3[a].y  <<" "<<scene_drawvec3[a].z   << "\n";
+    // }
 
     pointgen PG;
 
@@ -48,9 +43,6 @@ void test_bezier( vec3 start, vec3 ctrl1, vec3 ctrl2, vec3 end)
     PG.cubic_bezier(ptDrawvec, ptDrawClr,  ptnum_drawvec3, 10, start, ctrl1, ctrl2, end);
 
 }
-
-
-/******************************************/
 
 void test_pt_along(void)
 {
@@ -69,7 +61,10 @@ void test_pt_along(void)
 
 }
 
+
+*/
 /******************************************/
+
 
 void test_cncplot(void)
 {
@@ -80,7 +75,7 @@ void test_cncplot(void)
 
     vec3 s_p = newvec3(0.0 , 0.0 ,0.0 );
     vec3 e_p = newvec3(1.0 , 0.5 ,0.0);
-    plot.calc_3d_pulses(pt_pulsetrain, s_p, e_p);
+    plot.calc_3d_pulses(pt_pulsetrain, s_p, e_p, 2);
 
     /*
     int x=0;
@@ -116,7 +111,7 @@ void run_cncplot(double f_x,
     vec3 s_p = newvec3(f_x , f_y ,f_z );
     vec3 e_p = newvec3(s_x , s_y ,s_z );
 
-    plot.calc_3d_pulses(pt_pulsetrain, s_p, e_p);
+    plot.calc_3d_pulses(pt_pulsetrain, s_p, e_p, divs);
 
     if(DEBUG==true)
     {
@@ -170,24 +165,27 @@ int main(int argc, char **argv)
         vec3 a = sub(p1,p2);
         vec3 b = sub(p1,p3);
         vec3 n = normalize(cross(a,b));
-    */
-
-
-    //cnc_plot cnc;
-    //cnc.test_port();
-
-    //parse_args(argc, argv); 
     
+        //cnc_plot cnc;
+        //cnc.test_port();
+        //parse_args(argc, argv); 
+    */
+    
+    //start point (vector)
     double a1 = atof(argv[1]);
     double a2 = atof(argv[2]);
     double a3 = atof(argv[3]);
+
+    //end point (vector)
     double a4 = atof(argv[4]);
     double a5 = atof(argv[5]);
     double a6 = atof(argv[6]);
+
+    //number of divisions in X,Y,Z space
     int a7    = atoi(argv[7]);
           
     //cout << "# args are: "a1 << " "  << a2 << " " << a3 << " " << a4 << " " << a5 << " " << a6 << " " << a7 << " " ;
-                
+              
     run_cncplot( a1, a2, a3, a4, a5, a6, a7 );
 
     //test_cncplot();
