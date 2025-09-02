@@ -20,11 +20,18 @@ The "py" folder contains the python code I used to prototype the tool, and examp
 TODO:
   I still need to wire up the direction pulse, easy enough, just havent done it. 
   
-  I need to work out the pinout (see below) and properly bitchift the pins to match. 
+  I need to work out the pinout (see below) and properly bitshift the pins to match. 
   It currently only flashes all 8 bits ON or OFF. I need to bitshift the port to control single pins/channels/axes.
   
   The bits on the port will correspond to the CNC4PC breakout board pin assignment (and "standard" LinuxCNC).
   I enojoy using this board because its rleatively cheap and works well. You can certainly make your own interface or use others, I just did it this way because I had it on hand.
+
+  It gets exponentially slower for long distances with large numbers of divisions. 
+  To optimize it would be easy to insert extra pulses between the pulses. 
+
+
+
+
 
 
 

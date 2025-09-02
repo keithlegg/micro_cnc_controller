@@ -139,7 +139,23 @@ void parse_args(int argc, char **argv)
 
     }
 
-    
+    //start point (vector)
+    double a1 = atof(argv[1]);
+    double a2 = atof(argv[2]);
+    double a3 = atof(argv[3]);
+
+    //end point (vector)
+    double a4 = atof(argv[4]);
+    double a5 = atof(argv[5]);
+    double a6 = atof(argv[6]);
+
+    //number of divisions in X,Y,Z space
+    int a7    = atoi(argv[7]);
+          
+    //cout << "# args are: "a1 << " "  << a2 << " " << a3 << " " << a4 << " " << a5 << " " << a6 << " " << a7 << " " ;
+              
+    run_cncplot( a1, a2, a3, a4, a5, a6, a7 );
+
     /***************************/
     /*
     //defualt scan mode
@@ -168,25 +184,11 @@ int main(int argc, char **argv)
     
         //cnc_plot cnc;
         //cnc.test_port();
-        //parse_args(argc, argv); 
+
     */
     
-    //start point (vector)
-    double a1 = atof(argv[1]);
-    double a2 = atof(argv[2]);
-    double a3 = atof(argv[3]);
 
-    //end point (vector)
-    double a4 = atof(argv[4]);
-    double a5 = atof(argv[5]);
-    double a6 = atof(argv[6]);
-
-    //number of divisions in X,Y,Z space
-    int a7    = atoi(argv[7]);
-          
-    //cout << "# args are: "a1 << " "  << a2 << " " << a3 << " " << a4 << " " << a5 << " " << a6 << " " << a7 << " " ;
-              
-    run_cncplot( a1, a2, a3, a4, a5, a6, a7 );
+    parse_args(argc, argv); 
 
     //test_cncplot();
     //cout<<"all good\n";
