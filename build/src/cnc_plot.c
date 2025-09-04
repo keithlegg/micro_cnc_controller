@@ -17,15 +17,19 @@
 #include "math_op.h"
 #include "point_op.h"
 
-const double pulse_del = .01;
+//microsecond duration between all pulses 
+const double pulse_del = 500000;
 
 double xpos = 0;
 double ypos = 0;
 double zpos = 0;
 
 
+
+
 #define LPT1 0xc010
 //#define LPT1 0x0378
+
 
 
 /******************************************/
@@ -47,22 +51,22 @@ void cnc_plot::test_port(void)
     
     }
 
-    unsigned char foo = 0x00; 
+    unsigned char send_byte = 0x00;
     int a=0;int b=0;
 
     outb(0x00,LPT1); 
     //for(b=0;b<4;b++)
     //{
-        foo = 0x01;
+        send_byte = 0x01;
         for(a<0;a<8;a++)
         {
-            outb(foo,LPT1);
+            outb(send_byte,LPT1);
             usleep(500000); 
                        
             outb(0x00,LPT1); 
             usleep(500000); 
-            foo = foo << 1;
-            cout <<"bit "<< a <<" value: "<< HEX(foo) <<"\n";
+            send_byte = send_byte << 1;
+            cout <<"bit "<< a <<" value: "<< HEX(send_byte) <<"\n";
 
         }
     //}
@@ -72,12 +76,27 @@ void cnc_plot::test_port(void)
 /******************************************/
 /*
     take the output of calc_3d_pulses() and send the signals to the parallel port 
+    
+    The first electent of the array denotes direction pulses
+    
+
+
+    DB25 PINOUT (using the CNC4PC/LinuxCNC board as my "defualt")
+
+    2- X pulse 0x01
+    3- X dir   0x02
+    4- Y pulse 0x04
+    5- Y dir   0x08
+    6- Z pulse 0x10
+    7- Z dir   0x20
+
+
 
 */
 
 void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
 {
-
+    unsigned char send_byte = 0x00;
     int send_it = 1; 
 
     cout << "# we have pulses! count: " << pt_pulsetrain->size() << "\n";
@@ -87,18 +106,55 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
         if(ioperm(LPT1,1,1))
         { 
             fprintf(stderr, "# Couldn't open parallel port \n"), exit(1);
-        
         }
-    }
-    
-
-    if(send_it==1)
-    {
         cout << "# transmitting pulses to LPT port \n";
     }
 
+    //**************************//
+    vec3 dirpulses = pt_pulsetrain->at(0);
+    if(send_it==0)
+    {
+        cout <<"# debug - direction "<< dirpulses.x<<" " << dirpulses.y<<" " << dirpulses.z <<"\n";
+    }
+
+    if(send_it==1)
+    {    
+        //x direction high 
+        if (dirpulses.x>1){
+            //outb(0x02, LPT1);
+            send_byte = send_byte | (1 << 2);
+            outb(send_byte, LPT1);            
+        }else{
+             //outb(0x00, LPT1);  
+            send_byte = send_byte & ~(1 << 2);
+            outb(send_byte, LPT1);               
+        }
+
+        //y direction high 
+        if (dirpulses.y>1){
+            send_byte = send_byte | (1 << 4);
+            outb(send_byte, LPT1);               
+        }else{
+            //y direction low         
+            send_byte = send_byte & ~(1 << 4);
+            outb(send_byte, LPT1);               
+        }
+
+        //z direction high 
+        if (dirpulses.z>1){
+            send_byte = send_byte | (1 << 6);
+            outb(send_byte, LPT1);               
+        }else{
+            send_byte = send_byte & ~(1 << 6);   
+            outb(send_byte, LPT1);                   
+        }
+    }
+
+
+    //**************************//
     int x=0;
-    for(x=0;x<pt_pulsetrain->size();x++)
+    //intentionally skipping over the first
+    for(x=1;x<pt_pulsetrain->size();x++)
     {
         if(send_it==0)
         {
@@ -109,25 +165,30 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
         {
             //X channel 
             if(pt_pulsetrain->at(x).x==1){
-                outb(255,LPT1);  //set all pins hi
+                outb(0x01, LPT1);  
             }else{
-                outb(0  ,LPT1);  //set all pins low                
+
+              // uint8_t pin_mask = (1 << pin);
+              // uint8_t inverted_mask = ~pin_mask;
+              // PORTD &= inverted_mask;
+              //char mask = 0xff &= ~(1<<2);
+
+                //outb(0, LPT1);              
             }
-            
-            /*
+                
             //Y channel
             if(pt_pulsetrain->at(x).y==1){
-                outb(255,LPT1);  //set all pins hi
+                outb(0x04, LPT1);   
             }else{
-                outb(0  ,LPT1);  //set all pins low                
+                //outb(0, LPT1);                  
             }
 
             //Z channel
             if(pt_pulsetrain->at(x).z==1){
-                outb(255,LPT1);  //set all pins hi
+                outb(0x10, LPT1);   
             }else{
-                outb(0  ,LPT1);  //set all pins low                
-            }*/
+                //outb(0, LPT1);                 
+            }
 
             sleep(pulse_del); 
         }

@@ -103,7 +103,7 @@ void run_cncplot(double f_x,
 {
     cnc_plot plot;
 
-    bool DEBUG = true; 
+    bool DEBUG = false; 
 
     vector<vec3> pulsetrain;
     vector<vec3>* pt_pulsetrain = &pulsetrain; 
