@@ -1,4 +1,11 @@
+
+
+
 from cnc_math import *
+
+#from cnc_pt_op import *
+
+
 
 
 
@@ -124,21 +131,18 @@ class cnc_plot(object):
                 print(p)
 
 #---------------------------------#
-
+"""
 plot = cnc_plot()
-
-
 x = vec3(0 ,0 ,0  )
 y = vec3(7 ,.1 ,15  )
-
 
 #test the function 
 pts = plot.locate_pt_along3d(x,y,5)
 for pt in pts:
     print(pt)
 
-
 #p = plot.calc_3d_pulses(x,y)
+"""
 
 
 

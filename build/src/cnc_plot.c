@@ -17,14 +17,17 @@
 #include "math_op.h"
 #include "point_op.h"
 
-//microsecond duration between all pulses 
-int pulse_del = 500000;
 
+//µs (microsecond) duration between pulses 
+//gecko docs say minimun pulse with is 2.5µs per pulse - seems way too fast for me 
+int pulse_del = 1000;
+
+
+/*
 double xpos = 0;
 double ypos = 0;
 double zpos = 0;
-
-
+*/
 
 
 #define LPT1 0xc010
@@ -83,12 +86,12 @@ void cnc_plot::test_port(void)
 
     DB25 PINOUT (using the CNC4PC/LinuxCNC board as my "defualt")
 
-    2- X pulse 0x01
-    3- X dir   0x02
-    4- Y pulse 0x04
-    5- Y dir   0x08
-    6- Z pulse 0x10
-    7- Z dir   0x20
+    2- X pulse    0x01   (1<<0) 
+    3- X dir      0x02   (1<<1)
+    4- Y pulse    0x04   (1<<2)
+    5- Y dir      0x08   (1<<3)
+    6- Z pulse    0x10   (1<<4)
+    7- Z dir      0x20   (1<<5)
 
 
 
@@ -168,10 +171,8 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
                 send_byte = send_byte |= (1 << 0);
                 outb(send_byte, LPT1); 
             }else{
-
                 send_byte = send_byte &= ~ (1 << 0);
                 outb(send_byte, LPT1);  
-        
             }
                 
             //Y channel

@@ -5,7 +5,7 @@ import os
 
 simplest possible CNC control written in pure pyhton. 
 
-All vectors are assumed to have 3 elements. All matrices assumed to be 3*3
+All vectors are assumed to have 3 elements. 
 
 
 code is derived from gnelscript.math_ops library - Keith Legg 2018-2025
@@ -1055,4 +1055,570 @@ class matrix33(object):
 
 
 
+
+
+
+
+class matrix44(object):
+    """ 4X4 matrix from pure python 
+        limited support to interface to numpy arrays 
+
+        the patern "return type(self) is nice to return copies of itself,
+        but beware that this structure is not compatible for passing mutable types.
+        Only primitive types work, in this case floats  
+
+
+       -------------------------------------------------------------------------
+       standard affine transformation matrix.
+
+       ⎡m00  m01 m02 0⎤
+       ⎢m10  m11 m12 0⎥
+       ⎢m20  m21 m22 0⎥
+       ⎣Tx   Ty  Tz  1⎦
+       -------------------------------------------------------------------------
+
+    """    
+
+    def __init__(self, a=1,b=0,c=0,d=0,
+                       e=0,f=1,g=0,h=0,
+                       i=0,j=0,k=1,l=0,
+                       m=0,n=0,o=0,p=1):
+
+        self.mu = math_util()
+        self.m = [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p]
+
+
+    def from_np(self, np, order='cm'):
+        """ convert a numpy matrix to a matrix44 object
+            
+            order can be column major or row major  
+
+        """
+        # return type(self)(
+        #     np[0][0] , np[1][0] , np[2][0] ,
+        #     np[0][1] , np[1][1] , np[2][1] ,
+        #     np[0][2] , np[1][2] , np[2][2]
+        # )
+        
+
+        if order=='rm':
+            return type(self)(
+                np[0][0], np[1][0], np[2][0], np[3][0],
+                np[0][1], np[1][1], np[2][1], np[3][1],
+                np[0][2], np[1][2], np[2][2], np[3][2],
+                np[0][3], np[1][3], np[2][3], np[3][3]
+            )
+
+        if order=='cm':
+            return type(self)(
+                np[0][0], np[0][1], np[0][2], np[0][3],
+                np[1][0], np[1][1], np[1][2], np[1][3],
+                np[2][0], np[2][1], np[2][2], np[2][3],
+                np[3][0], np[3][1], np[3][2], np[3][3]
+            )
+
+    def load_file(self, filename, transpose=False):
+       if os.path.lexists(filename):
+            f = open( filename,"r", encoding='utf-8')
+            ct = 0
+            for lin in f.readlines():
+                c = lin.replace('\n','').split(' ')
+                if ct==0:
+                    self.m[0]=float(c[0])
+                    self.m[1]=float(c[1])
+                    self.m[2]=float(c[2])
+                    self.m[3]=float(c[3])                                                        
+                if ct==1:
+                    self.m[4]=float(c[0])
+                    self.m[5]=float(c[1])
+                    self.m[6]=float(c[2])
+                    self.m[7]=float(c[3])  
+                if ct==2:
+                    self.m[8]=float(c[0])
+                    self.m[9]=float(c[1])
+                    self.m[10]=float(c[2])
+                    self.m[11]=float(c[3])  
+                if ct==3:
+                    self.m[12]=float(c[0])
+                    self.m[13]=float(c[1])
+                    self.m[14]=float(c[2])
+                    self.m[15]=float(c[3])  
+
+                ct += 1
+
+    def __getitem__(self, index):
+        return self.m[index]
+
+    def __setitem__(self, key, item):
+        self.m[key] = item
+
+    def __repr__(self):
+        return '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s )'%(
+                self.m[0], self.m[1], self.m[2],  self.m[3],  self.m[4],  self.m[5],  self.m[6],  self.m[7], 
+                self.m[8], self.m[9], self.m[10], self.m[11], self.m[12], self.m[13], self.m[14], self.m[15])
+
+    def __add__(self, n):
+        return type(self)(
+                self.m[0] +n[0] , self.m[1]+n[1]  , self.m[2]+n[2]  , self.m[3]+n[3]  , 
+                self.m[4] +n[4] , self.m[5]+n[5]  , self.m[6]+n[6]  , self.m[7]+n[7]  ,
+                self.m[8] +n[8] , self.m[9]+n[9]  , self.m[10]+n[10], self.m[11]+n[11],
+                self.m[12]+n[12], self.m[13]+n[13], self.m[14]+n[14], self.m[15]+n[15]
+               )
+       
+    def __sub__(self, n):
+        return type(self)(
+                self.m[0] -n[0] , self.m[1]-n[1]  , self.m[2]-n[2]  , self.m[3]-n[3]  , 
+                self.m[4] -n[4] , self.m[5]-n[5]  , self.m[6]-n[6]  , self.m[7]-n[7]  ,
+                self.m[8] -n[8] , self.m[9]-n[9]  , self.m[10]-n[10], self.m[11]-n[11],
+                self.m[12]-n[12], self.m[13]-n[13], self.m[14]-n[14], self.m[15]-n[15]
+               )
+
+    def __mul__(self, n):
+        """multiply this 4X4 by another 4X4 matrix or a vector3, vector4 """
+        
+        ## if isinstance(n, vec4):
+        ##     #untested
+        ##     #https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic
+        ##     #    -projection-matrix/building-basic-perspective-projection-matrix
+        ##     # row major * vec4 
+        ##     # outx = n.x*self.m[0]   + n.y*self.m[1]  +  n.z*self.m[2]   +  n.w *self.m[3] 
+        ##     # outy = n.x*self.m[4]   + n.y*self.m[5]  +  n.z*self.m[6]   +  n.w *self.m[7] 
+        ##     # outz = n.x*self.m[8]   + n.y*self.m[9]  +  n.z*self.m[10]  +  n.w *self.m[11]                         
+        ##     # outw = n.x*self.m[12]  + n.y*self.m[13] +  n.z*self.m[14]  +  n.w *self.m[15] 
+        ##     # column major * vec4 
+        ##     outx = n.x*self.m[0]  + n.y*self.m[4]  +  n.z*self.m[8]   +  n.w *self.m[12] 
+        ##     outy = n.x*self.m[1]  + n.y*self.m[5]  +  n.z*self.m[9]   +  n.w *self.m[13] 
+        ##     outz = n.x*self.m[2]  + n.y*self.m[6]  +  n.z*self.m[10]  +  n.w *self.m[14]                         
+        ##     outw = n.x*self.m[3]  + n.y*self.m[7]  +  n.z*self.m[11]  +  n.w *self.m[15] 
+        ##     return  (outx, outy, outz, outw)
+
+   
+        if isinstance(n, vec3): # or isinstance(n, np.ndarray):
+            # column major -                      why add the last 12,13,14 ? (affine?)            
+            # outx = self.m[0] * n.x + self.m[4] * n.y + self.m[8]  * n.z     + self.m[12]
+            # outy = self.m[1] * n.x + self.m[5] * n.y + self.m[9]  * n.z     + self.m[13]
+            # outz = self.m[2] * n.x + self.m[6] * n.y + self.m[10] * n.z     + self.m[14]
+
+            # column major  , without elements 12,13,14 
+            outx = self.m[0] * n.x + self.m[4] * n.y + self.m[8]  * n.z 
+            outy = self.m[1] * n.x + self.m[5] * n.y + self.m[9]  * n.z 
+            outz = self.m[2] * n.x + self.m[6] * n.y + self.m[10] * n.z 
+            return  (outx, outy, outz)
+
+
+        if isinstance(n, tuple) or isinstance(n, list):
+            
+            # what is the purspose of adding 12,13,14 ?
+            outx = self.m[0] * n[0] + self.m[4] * n[1] + self.m[8]  * n[2]     + self.m[12]
+            outy = self.m[1] * n[0] + self.m[5] * n[1] + self.m[9]  * n[2]     + self.m[13]
+            outz = self.m[2] * n[0] + self.m[6] * n[1] + self.m[10] * n[2]     + self.m[14]
+
+            # column major, same as first, without 12,13,14               
+            #outx = self.m[0] * n[0] + self.m[4] * n[1] + self.m[8]  * n[2] 
+            #outy = self.m[1] * n[0] + self.m[5] * n[1] + self.m[9]  * n[2] 
+            #outz = self.m[2] * n[0] + self.m[6] * n[1] + self.m[10] * n[2] 
+
+            # row major - same as first, without 12,13,14    
+            # outx = self.m[0] * n[0] + self.m[1] * n[1] + self.m[2]  * n[2] 
+            # outy = self.m[4] * n[0] + self.m[5] * n[1] + self.m[6]  * n[2] 
+            # outz = self.m[8] * n[0] + self.m[9] * n[1] + self.m[10] * n[2] 
+            return  (outx, outy, outz)
+
+
+        if type(n) == type(self):
+            return type(self)(
+                    self.m[0]*n[0]  + self.m[1]*n[4]  + self.m[2]*n[8]   + self.m[3]*n[12] ,
+                    self.m[0]*n[1]  + self.m[1]*n[5]  + self.m[2]*n[9]   + self.m[3]*n[13] ,
+                    self.m[0]*n[2]  + self.m[1]*n[6]  + self.m[2]*n[10]  + self.m[3]*n[14] ,
+                    self.m[0]*n[3]  + self.m[1]*n[7]  + self.m[2]*n[11]  + self.m[3]*n[15] ,
+                    self.m[4]*n[0]  + self.m[5]*n[4]  + self.m[6]*n[8]   + self.m[7]*n[12] ,
+                    self.m[4]*n[1]  + self.m[5]*n[5]  + self.m[6]*n[9]   + self.m[7]*n[13] ,
+                    self.m[4]*n[2]  + self.m[5]*n[6]  + self.m[6]*n[10]  + self.m[7]*n[14] ,
+                    self.m[4]*n[3]  + self.m[5]*n[7]  + self.m[6]*n[11]  + self.m[7]*n[15] ,
+                    self.m[8]*n[0]  + self.m[9]*n[4]  + self.m[10]*n[8]  + self.m[11]*n[12],
+                    self.m[8]*n[1]  + self.m[9]*n[5]  + self.m[10]*n[9]  + self.m[11]*n[13],
+                    self.m[8]*n[2]  + self.m[9]*n[6]  + self.m[10]*n[10] + self.m[11]*n[14],
+                    self.m[8]*n[3]  + self.m[9]*n[7]  + self.m[10]*n[11] + self.m[11]*n[15],
+                    self.m[12]*n[0] + self.m[13]*n[4] + self.m[14]*n[8]  + self.m[15]*n[12],
+                    self.m[12]*n[1] + self.m[13]*n[5] + self.m[14]*n[9]  + self.m[15]*n[13],
+                    self.m[12]*n[2] + self.m[13]*n[6] + self.m[14]*n[10] + self.m[15]*n[14],
+                    self.m[12]*n[3] + self.m[13]*n[7] + self.m[14]*n[11] + self.m[15]*n[15]
+                   )
+
+    @property
+    def as_np(self):
+        return np.array((
+            [self.m[0] , self.m[1] , self.m[2] , self.m[3]  ],
+            [self.m[4] , self.m[5] , self.m[6] , self.m[7]  ],
+            [self.m[8] , self.m[9] , self.m[10], self.m[11] ],
+            [self.m[12], self.m[13], self.m[14], self.m[15] ]
+        ))   
+
+    @property
+    def identity(self):
+        """ using the "standard" 16 element, Row major, 4X4 rotation matrix """
+        #return  [ 1,0,0,0 ,0,1,0,0 ,0,0,1,0 ,0,0,0,1]
+        return type(self)()
+
+    def np_inverse(self, mtype='numpy'):
+        """ untested """
+        if NUMPY_IS_LOADED:
+            a = self.copy(mtype='numpy')
+            b = inv(a)
+            if mtype=='numpy':
+                return b 
+            if mtype=='m44':    
+                c = matrix44()
+                c.insert(b)
+                return c
+
+    #@property
+    def test_index(self):
+        """ fill matrix with incrementing number to see indices """
+        tmp = type(self)()
+        for i in range(16):
+            tmp[i] = i
+        return tmp
+
+    def serialize(self, inarray):
+        """ serialize this array into a list """
+
+        out = []
+        for i in self.m:
+            out.append(i)
+        return out
+
+    def insert(self, iterable):
+        """ UNTESTED - load the first 16 things we find into this matrix """
+
+        if isinstance(iterable, matrix44):
+            self.m = iterable.m
+
+        #serialized simple array
+        if isinstance(iterable, list) or isinstance(iterable, tuple):
+            for idx,i in enumerate(iterable):
+                if idx <= 16:
+                     self.m[idx] = iterable[idx] 
+
+        if NUMPY_IS_LOADED:
+             #numpy ND array 
+            if isinstance(iterable, np.ndarray):
+                out = [];idx=0
+                for row in iterable:
+                    for col in row:
+                        self.m[idx] = col
+                        idx+=1
+
+    #@property
+    def copy(self, mtype=None):
+        """ UNTESTED """
+        if mtype == None:        
+            return type(self)(
+                self.m[0] , self.m[1] , self.m[2] , self.m[3] ,
+                self.m[4] , self.m[5] , self.m[6] , self.m[7] ,
+                self.m[8] , self.m[9] , self.m[10], self.m[11],
+                self.m[12], self.m[13], self.m[14], self.m[15]
+            )
+
+        if NUMPY_IS_LOADED:
+            if mtype == 'numpy':
+                return np.array((
+                    [self.m[0] , self.m[1] , self.m[2] , self.m[3]  ],
+                    [self.m[4] , self.m[5] , self.m[6] , self.m[7]  ],
+                    [self.m[8] , self.m[9] , self.m[10], self.m[11] ],
+                    [self.m[12], self.m[13], self.m[14], self.m[15] ]
+                ))               
+
+    @property
+    def transpose(self):
+        """ m44 transpose """
+
+        return type(self)(
+            self.m[0], self.m[4], self.m[8] , self.m[12],
+            self.m[1], self.m[5], self.m[9] , self.m[13],
+            self.m[2], self.m[6], self.m[10], self.m[14],
+            self.m[3], self.m[7], self.m[11], self.m[15]
+        )
+
+    @property
+    def determinant(self):
+        """
+            Laplace expansion method 
+
+            https://www.mathsisfun.com/algebra/matrix-determinant.html
+
+            plus  a times the determinant of the matrix that is not in a's row or column,
+            minus b times the determinant of the matrix that is not in b's row or column,
+            plus  c times the determinant of the matrix that is not in c's row or column,
+            minus d times the determinant of the matrix that is not in d's row or column,
+
+                       |               | A*        -     B*      +        C*    -         D*|
+            a  b  c  d | 0   1  2   3  | a -->     |  <--b-->    |     <--c-->  |      <--d |  
+            e  f  g  h | 4   5  6   7  | |  f g h  |  e  |  g  h |  e  f  |  h  | e  f  g | |
+            i  j  k  l | 8   9  10  11 |    j k l  |  i     k  l |  i  j     l  | i  j  k   |
+            m  n  o  p | 12  13 14  15 |    n o p  |  m     o  p |  m  n     p  | m  n  o   | 
+
+        """  
+
+
+        def det33(a):
+            #same as matrix33 determinant method 
+            o = a[0]* ((a[4]*a[8])-(a[5]*a[7])) - a[1]*((a[3]*a[8])-(a[5]*a[6])) +  a[2]*((a[3]*a[7])-(a[4]*a[6]))
+            return o
+
+        a = self.copy() 
+        
+        a33 = [a[5],a[6],a[7],a[9],a[10],a[11],a[13],a[14],a[15] ]
+        b33 = [a[4],a[6],a[7],a[8],a[10],a[11],a[12],a[14],a[15] ]
+        c33 = [a[4],a[5],a[7],a[8],a[9] ,a[11],a[12],a[13],a[15] ]
+        d33 = [a[4],a[5],a[6],a[8],a[9] ,a[10],a[12],a[13],a[14] ]
+        o = (a[0] * det33(a33)) - (a[1]*det33(b33)) + (a[2]*det33(c33)) - (a[3]*det33(d33))
+        return o
+
+    def batch_mult_pts(self, pts):
+        """ sub component of matrix rotate function 
+            multiply a 4X4 matrix by a list of points 
+        """
+        #debug - make work with other types??
+
+        tmp_buffer = []
+        out = None
+        for pvec in pts:  
+            #total experiment for perpective/homogeneous coordinates  
+            #pvec = vec4(pt[0], pt[1], pt[2], 1)
+            #print(pvec)
+            tmp_buffer.append( self * pvec )
+ 
+        return tmp_buffer
+
+    def from_euler(self, rotation ):
+        """
+            derived from the rotate_pts_3d function 
+            go read that doc for explanation  
+        """
+        
+        xrot = rotation[0]
+        yrot = rotation[1]
+        zrot = rotation[2]
+
+
+        dtr = self.mu.dtr
+
+        ####
+        #build rotationY (see diagram above) 
+        y_matrix     =  self.identity
+        y_matrix[0]  =  math.cos(dtr( yrot ))
+        y_matrix[2]  = -math.sin(dtr( yrot ))
+        y_matrix[8]  =  math.sin(dtr( yrot ))
+        y_matrix[10] =  math.cos(dtr( yrot ))
+
+        ####                
+        #build rotationZ (see diagram above) 
+        z_matrix    =  self.identity
+        z_matrix[0] =  math.cos(dtr( zrot ))
+        z_matrix[1] =  math.sin(dtr( zrot ))
+        z_matrix[4] = -math.sin(dtr( zrot ))
+        z_matrix[5] =  math.cos(dtr( zrot ))
+        tmp_matr = y_matrix * z_matrix 
+
+        ####
+        #build rotationX (see diagram above) 
+        x_matrix     =  self.identity
+        x_matrix[5]  =   math.cos(dtr( xrot )) 
+        x_matrix[6]  =   math.sin(dtr( xrot )) 
+        x_matrix[9]  =  -math.sin(dtr( xrot ))
+        x_matrix[10] =   math.cos(dtr( xrot ))
+        rotation_44 = x_matrix * tmp_matr
+ 
+        self.insert(rotation_44)
+
+    def rotate_pts_3d(self, points, xrot, yrot, zrot):
+        """
+           The "standard" 16 element, Row major, 4X4 rotation matrix 
+
+           ⎡0   1   2   3  ⎤    ⎡   XVEC    0 ⎤
+           ⎢4   5   6   7  ⎥    ⎢   YVEC    0 ⎥
+           ⎢8   9   10  11 ⎥    ⎢   ZVEC    0 ⎥
+           ⎣12  13  14  15 ⎦    ⎣ 0  0  0   0 ⎦
+
+           ⎡0   1   2   3 ⎤     ⎡xx  xy  xz  0⎤
+           ⎢4   5   6   7 ⎥     ⎢yx  yy  yz  0⎥
+           ⎢8   9   10  11⎥     ⎢zx  zy  zz  0⎥
+           ⎣12  13  14  15⎦     ⎣0   0   0   0⎦
+           ------------------------------
+           rotate Y matrix     
+           ⎡  cos(y)  0      -sin(y)  0 ⎤ 
+           ⎢  0       1       0       0 ⎥ 
+           ⎢  sin(y)  0       cos(y)  0 ⎥ 
+           ⎣  0       0       0       1 ⎦
+           ------------------------------
+           rotate Z  matrix 
+           ⎡  cos(z)  sin(z)  0       0 ⎤ 
+           ⎢ -sin(z)  cos(z)  0       0 ⎥
+           ⎢  0       0       1       0 ⎥
+           ⎣  0       0       0       1 ⎦
+           ------------------------------
+           rotate X matrix  
+           ⎡  1       0       0       0 ⎤  
+           ⎢  0       cos(x)  sin(x)  0 ⎥  
+           ⎢  0      -sin(x)  cos(x)  0 ⎥  
+           ⎣  0       0       0       1 ⎦ 
+        """
+        dtr = self.mu.dtr
+
+        ####
+        #build rotationY (see diagram above) 
+        y_matrix     =  self.identity
+        y_matrix[0]  =  math.cos(dtr( yrot ))
+        y_matrix[2]  = -math.sin(dtr( yrot ))
+        y_matrix[8]  =  math.sin(dtr( yrot ))
+        y_matrix[10] =  math.cos(dtr( yrot ))
+
+        ####                
+        #build rotationZ (see diagram above) 
+        z_matrix    =  self.identity
+        z_matrix[0] =  math.cos(dtr( zrot ))
+        z_matrix[1] =  math.sin(dtr( zrot ))
+        z_matrix[4] = -math.sin(dtr( zrot ))
+        z_matrix[5] =  math.cos(dtr( zrot ))
+        tmp_matr = y_matrix * z_matrix 
+
+        ####
+        #build rotationX (see diagram above) 
+        x_matrix     =  self.identity
+        x_matrix[5]  =   math.cos(dtr( xrot )) 
+        x_matrix[6]  =   math.sin(dtr( xrot )) 
+        x_matrix[9]  =  -math.sin(dtr( xrot ))
+        x_matrix[10] =   math.cos(dtr( xrot ))
+        rotation_44 = x_matrix * tmp_matr
+
+        ############ 
+        return rotation_44.batch_mult_pts(points)
+
+    def buildPerspProjMat(self, fov, aspect, znear, zfar):
+        """
+            UNTESTED 
+            
+            transformation matrix that changes the W element of each vertex. 
+            After the the camera matrix is applied to each vertex, 
+            but before the projection matrix is applied, 
+            the Z element of each vertex represents the distance away from the camera. 
+            the larger Z is, the more the vertex should be scaled down
+
+
+            http://stackoverflow.com/questions/8633034/basic-render-3d-perspective-projection-onto-2d-screen-with-camera-without-openg
+
+            use homogenous transformations and coordinates. 
+
+            take a point in space and:
+                Position it relative to the camera using the model matrix.
+                Project it either orthographically or in perspective using the projection matrix.
+                Apply the viewport transformation to place it on the screen.
+
+
+
+
+        """
+
+        PI_OVER_360 = 0.00872664625
+        #xymax = 100
+        xymax = znear * math.tan(fov * PI_OVER_360);
+
+        ymin = -xymax
+        xmin = -xymax
+
+        width = xymax - xmin
+        height = xymax - ymin
+
+        depth =  zfar - znear
+        
+        #avoid those pesky divide by zero errors 
+        if depth==0:
+            depth=.1
+        if width==0:
+            width=1
+        if height==0:
+            height=1                        
+
+        q     = -(zfar + znear) / depth
+        qn    = -2 * (zfar * znear) / depth
+
+        w = 2 * znear / width
+        w = w / aspect
+        h = 2 * znear / height
+
+        m = self.identity
+
+        # m[0]  = w; m[4]  = 0; m[8]  = 0 ; m[12] = 0
+        # m[1]  = 0; m[5]  = h; m[9]  = 0 ; m[13] = 0
+        # m[2]  = 0; m[6]  = 0; m[10] = q ; m[14] = qn 
+        # m[3]  = 0; m[7]  = 0; m[11] =-1 ; m[15] = 0
+
+        m[0]=w ; m[1]=0  ; m[2]=0  ; m[3]=0;
+        m[4]=0 ; m[5]=h  ; m[6]=0  ; m[7]=0;
+        m[8]=0 ; m[9]=0  ; m[10]=q ; m[11]=-1;
+        m[12]=0; m[13]=0 ; m[14]=qn; m[15]=0;
+        
+        #print(m)
+        return m
+
+
+    def align_vectors(self, a, b, return_angle=False):
+        """
+        From - trimesh.geometry.align_vectors 
+
+        Find the rotation matrix that transforms one 3D vector
+        to another.
+
+        Parameters
+        ------------
+        a : (3,) float
+          Unit vector
+        b : (3,) float
+          Unit vector
+        return_angle : bool
+          Return the angle between vectors or not
+
+        Returns
+        -------------
+        matrix : (4, 4) float
+          Homogeneous transform to rotate from `a` to `b`
+        angle : float
+          If `return_angle` angle in radians between `a` and `b`
+
+        """
+        if type(a)==vec3: 
+            a=a.as_np 
+        if type(b)==vec3: 
+            b=b.as_np 
+
+        a = np.array(a, dtype=np.float64)
+        b = np.array(b, dtype=np.float64)
+        if a.shape != (3,) or b.shape != (3,):
+            raise ValueError("vectors must be (3,)!")
+
+        # find the Singular Value Decomposition of the two vectors
+        au = np.linalg.svd(a.reshape((-1, 1)))[0]
+        bu = np.linalg.svd(b.reshape((-1, 1)))[0]
+
+        if np.linalg.det(au) < 0:
+            au[:, -1] *= -1.0
+        if np.linalg.det(bu) < 0:
+            bu[:, -1] *= -1.0
+
+        # put rotation into homogeneous transformation
+        matrix = np.eye(4)
+        matrix[:3, :3] = bu.dot(au.T)
+
+        if return_angle:
+            # projection of a onto b
+            # first row of SVD result is normalized source vector
+            dot = np.dot(au[0], bu[0])
+            # clip to avoid floating point error
+            angle = np.arccos(np.clip(dot, -1.0, 1.0))
+            if dot < -1e-5:
+                angle += np.pi
+            return matrix, angle
+
+        return matrix
 
