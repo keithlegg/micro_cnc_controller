@@ -122,30 +122,30 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
         //x direction high 
         if (dirpulses.x>1){
             //outb(0x02, LPT1);
-            send_byte = send_byte | (1 << 2);
+            send_byte = send_byte |= (1 << 2);
             outb(send_byte, LPT1);            
         }else{
              //outb(0x00, LPT1);  
-            send_byte = send_byte & ~(1 << 2);
+            send_byte = send_byte &= ~(1 << 2);
             outb(send_byte, LPT1);               
         }
 
         //y direction high 
         if (dirpulses.y>1){
-            send_byte = send_byte | (1 << 4);
+            send_byte = send_byte |= (1 << 4);
             outb(send_byte, LPT1);               
         }else{
             //y direction low         
-            send_byte = send_byte & ~(1 << 4);
+            send_byte = send_byte &= ~(1 << 4);
             outb(send_byte, LPT1);               
         }
 
         //z direction high 
         if (dirpulses.z>1){
-            send_byte = send_byte | (1 << 6);
+            send_byte = send_byte |= (1 << 6);
             outb(send_byte, LPT1);               
         }else{
-            send_byte = send_byte & ~(1 << 6);   
+            send_byte = send_byte &= ~(1 << 6);   
             outb(send_byte, LPT1);                   
         }
     }
@@ -165,29 +165,31 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
         {
             //X channel 
             if(pt_pulsetrain->at(x).x==1){
-                outb(0x01, LPT1);  
+                send_byte = send_byte |= (1 << 1);
+                outb(send_byte, LPT1); 
             }else{
 
-              // uint8_t pin_mask = (1 << pin);
-              // uint8_t inverted_mask = ~pin_mask;
-              // PORTD &= inverted_mask;
-              //char mask = 0xff &= ~(1<<2);
-
-                //outb(0, LPT1);              
+                send_byte = send_byte &= ~ (1 << 1);
+                outb(send_byte, LPT1);  
+        
             }
                 
             //Y channel
             if(pt_pulsetrain->at(x).y==1){
-                outb(0x04, LPT1);   
+                send_byte = send_byte |= (1 << 3);
+                outb(send_byte, LPT1);    
             }else{
-                //outb(0, LPT1);                  
+                send_byte = send_byte &= ~(1 << 3);
+                outb(send_byte, LPT1);                
             }
 
             //Z channel
             if(pt_pulsetrain->at(x).z==1){
-                outb(0x10, LPT1);   
+                send_byte = send_byte |= (1 << 5);
+                outb(send_byte, LPT1);   
             }else{
-                //outb(0, LPT1);                 
+                send_byte = send_byte &= ~(1 << 5);
+                outb(send_byte, LPT1);                 
             }
 
             sleep(pulse_del); 
