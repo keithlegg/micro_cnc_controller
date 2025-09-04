@@ -163,18 +163,57 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
             int pp_luy      = numdivs;
             int pp_luz      = numdivs;
 
-         
+
+            //make some storage for the data to work in 
+            vector<vec3> x_pts;
+            vector<vec3> y_pts;
+            vector<vec3> z_pts;
+            vector<vec3> samples;
+
+            //make some pointers to those data.
+            //(people who say THOSE data are technically correct, but they are pedantic dillholes) 
+            vector<vec3>* pt_xpts    = &x_pts;
+            vector<vec3>* pt_ypts    = &y_pts;
+            vector<vec3>* pt_zpts    = &z_pts;
+            vector<vec3>* pt_samples = &samples;
+
+
             //set up variables to do vector-y stuff
             vec3 between   = sub(fr_pt, to_pt);
             double mag     = length(between);
             double gran    = 0;  //granularity 
             double thresh  = 0;  //threshold 
             //cout << mag <<"\n";
+            
+            int xp=0;int yp=0;int zp=0;
 
             //calculate the absolute change for each axis  
             double delta_x = fr_pt.x-to_pt.x;
             double delta_y = fr_pt.y-to_pt.y;
             double delta_z = fr_pt.z-to_pt.z;
+
+            //calc the direction of the vector 
+            if (to_pt.x>fr_pt.x){
+                xp=2;
+            }else{
+                xp=0; 
+            }
+            //calc the direction of the vector 
+            if (to_pt.y>fr_pt.y){
+                yp=2;
+            }else{
+                yp=0; 
+            }
+            //calc the direction of the vector 
+            if (to_pt.z>fr_pt.z){
+                zp=2;
+            }else{
+                zp=0; 
+            }
+            //first element of pulse train stores the direction 
+            pt_pulsetrain->push_back(newvec3(xp,yp,zp));
+
+ 
 
             //use the total change to calculate the maximum possible pulses for each axis
             int num_pul_x = abs(delta_x)*pp_lux;
@@ -196,19 +235,7 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
             }else{
                 gran = 0;
             }
- 
-            //make some storage for the data to work in 
-            vector<vec3> x_pts;
-            vector<vec3> y_pts;
-            vector<vec3> z_pts;
-            vector<vec3> samples;
 
-            //make some pointers to those data.
-            //(people who say THOSE data are technically correct, but they are pedantic dillholes) 
-            vector<vec3>* pt_xpts    = &x_pts;
-            vector<vec3>* pt_ypts    = &y_pts;
-            vector<vec3>* pt_zpts    = &z_pts;
-            vector<vec3>* pt_samples = &samples;
 
             // calculate a series of points along vector for each axis 
             if(num_pul_x!=0)
@@ -238,8 +265,6 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
                 {
                     
                     vec3 spt = samples[a]; 
-                    int xp=0;int yp=0;int zp=0;
-                    
 
                     //X 
                     for (i=0;i<x_pts.size();i++)
