@@ -216,6 +216,8 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
                               int numdivs)
 {
 
+            bool debug = false;
+
             pointgen PG;
 
             //set the pulses per linear unit (spatial unit divions) - X,Y,Z unit prescaler 
@@ -283,7 +285,9 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
             int num_pul_x = abs(delta_x)*pp_lux;
             int num_pul_y = abs(delta_y)*pp_luy;
             int num_pul_z = abs(delta_z)*pp_luz;
-            //cout << "# num pulses " << num_pul_x <<" "<<num_pul_y<<" "<<num_pul_z <<"\n";
+            
+            if (debug)
+                cout << "# num pulses " << num_pul_x <<" "<<num_pul_y<<" "<<num_pul_z <<"\n";
 
             // get the absolute highest number of pulses (on any axis) to calculate 
             int tmp[] = {num_pul_x, num_pul_y, num_pul_z};
@@ -327,7 +331,11 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
                 int a=0;int i=0;
                 for(a=0;a<samples.size();a++)
                 {
-                    
+ 
+                    xp=0;
+                    yp=0;
+                    zp=0;
+
                     vec3 spt = samples[a]; 
 
                     //X 
