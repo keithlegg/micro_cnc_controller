@@ -279,13 +279,12 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
             //first element of pulse train stores the direction 
             pt_pulsetrain->push_back(newvec3(xp,yp,zp));
 
- 
-
-            //use the total change to calculate the maximum possible pulses for each axis
-            int num_pul_x = abs(delta_x)*pp_lux;
-            int num_pul_y = abs(delta_y)*pp_luy;
-            int num_pul_z = abs(delta_z)*pp_luz;
             
+            //not totally sure this is right 
+            int num_pul_x = (mag*pp_lux)*abs(delta_x);
+            int num_pul_y = (mag*pp_luy)*abs(delta_y);
+            int num_pul_z = (mag*pp_luz)*abs(delta_z);            
+
             if (debug)
                 cout << "# num pulses " << num_pul_x <<" "<<num_pul_y<<" "<<num_pul_z <<"\n";
 
@@ -346,7 +345,7 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
                         if( length(ss)<thresh)
                         {
                             xp=1;
-                            break;
+                            //break;
                         }
                     }
 
@@ -358,7 +357,7 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
                         if( length(ss)<thresh)
                         {
                             yp=1;
-                            break;
+                            //break;
                         }
                     }
 
@@ -371,7 +370,7 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
                         if( length(ss)<thresh)
                         {
                             zp=1;
-                            break;
+                            //break;
                         }
                     }
 
