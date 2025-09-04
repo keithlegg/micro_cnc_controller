@@ -18,12 +18,16 @@ class cnc_plot
 
     void test_port(void);
 
-    void calc_3d_pulses(vector<vec3>* pt_pulsetrain,
-                        vec3 fr_pt, 
-                        vec3 to_pt,
-                        int numdivs);
+    void gen_pules(vector<int>*, int, int);
 
-    void send_pulses(vector<vec3>* pt_pulsetrain);
+    void gen_3d_pules(vector<vec3>*, int, int);
+
+    void calc_3d_pulses(vector<vec3>*,
+                        vec3, 
+                        vec3,
+                        int);
+
+    void send_pulses(vector<vec3>*);
 
 };
 

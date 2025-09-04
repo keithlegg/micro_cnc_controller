@@ -190,6 +190,17 @@ int main(int argc, char **argv)
 
     parse_args(argc, argv); 
 
+    /*
+    vector<int> pt;
+    cnc_plot plot;
+    plot.gen_pules(&pt, atoi(argv[1]), atoi(argv[2]));
+    int a=0;
+    for(a=0;a<pt.size();a++)
+    {
+        cout << pt.at(a)<<" " << "\n";
+    }*/
+
+
     //test_cncplot();
     //cout<<"all good\n";
 

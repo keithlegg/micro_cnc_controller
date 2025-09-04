@@ -54,13 +54,13 @@ struct quaternion {
 double dtr ( double deg);
 double rtd ( double rad);
 
-double dotProduct ( vec2 v1, vec2 v2);
-double dotProduct ( vec3 v1, vec3 v2);
+double dotProduct ( vec2, vec2);
+double dotProduct ( vec3, vec3);
 
 double fcalc_distance(int pt1[2], int pt2[2]);
 double fcalc_distance(double pt1[2], double pt2[2]);
-double length( vec2 input);
-double length( vec3 input);
+double length( vec2);
+double length( vec3);
 
 
 double calc_theta_vert ( double start_x, double start_y, double end_x, double end_y);

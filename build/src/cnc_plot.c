@@ -36,6 +36,86 @@ double zpos = 0;
 
 
 /******************************************/
+//void cnc_plot::gen_3d_pules(vector<vec3>* pt_pulsetrain, int size, int num)
+//{
+//}
+      
+
+/******************************************/
+void cnc_plot::gen_pules(vector<int>* pt_pulsetrain, int size, int num)
+{
+    
+    if(num>size)
+    {
+        cout << "# gen_pules: size arg may not excede number \n";
+
+        exit(1);
+    }
+
+    double div = (double)size/(double)num;
+    double gran = div/num;
+
+    int a;  
+
+    //if zero make all zeros
+    if(num==0)
+    {
+        for(a=0;a<size;a++)
+        {
+            pt_pulsetrain->push_back(0);            
+        }
+    }
+
+    //exception for integer 1 
+    if(num==1)
+    {
+        for(a=0;a<size;a++)
+        {
+
+            if( a == size/2)
+            {
+                //cout <<"1\n";
+                pt_pulsetrain->push_back(1);
+            }else  
+            {
+                //cout <<"0\n";
+                pt_pulsetrain->push_back(0);
+            } 
+
+        }
+    }
+
+    //all else 
+    if(num>1)
+    {
+        for(a=0;a<size;a++)
+        {
+            double chunk = fmod(a,div);
+            //cout << chunk  <<" "<< gran <<" "<<fmod(chunk,gran) <<"\n";
+            //cout << "# # "<<chunk << "\n";
+            if( chunk < 1)
+            {
+                //cout <<"1\n";
+                //cout <<"0\n";
+                pt_pulsetrain->push_back(1);
+                //pt_pulsetrain->push_back(0);                
+            }
+            if( chunk > 1)
+            {
+                //cout <<"0\n";
+                pt_pulsetrain->push_back(0);                   
+            } 
+            if ( chunk==1){
+                pt_pulsetrain->push_back(0);                 
+            }
+        }
+    } 
+
+}
+      
+
+
+/******************************************/
 /*
 std::vector<int> my_sort(const std::vector<int>& v) {
       auto result = v; // passing v by value and returning it defeats NRVO
@@ -247,6 +327,138 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
             //set up variables to do vector-y stuff
             vec3 between   = sub(fr_pt, to_pt);
             double mag     = length(between);
+            
+            //double gran    = 0;  //granularity 
+            //double thresh  = 0;  //threshold 
+            //cout << mag <<"\n";
+            
+            int xp=0;int yp=0;int zp=0;
+
+            //calculate the absolute change for each axis  
+            double delta_x = fr_pt.x-to_pt.x;
+            double delta_y = fr_pt.y-to_pt.y;
+            double delta_z = fr_pt.z-to_pt.z;
+
+            //calc the direction of the vector 
+            if (to_pt.x>fr_pt.x){
+                xp=2;
+            }else{
+                xp=0; 
+            }
+            //calc the direction of the vector 
+            if (to_pt.y>fr_pt.y){
+                yp=2;
+            }else{
+                yp=0; 
+            }
+            //calc the direction of the vector 
+            if (to_pt.z>fr_pt.z){
+                zp=2;
+            }else{
+                zp=0; 
+            }
+            //first element of pulse train stores the direction 
+            pt_pulsetrain->push_back(newvec3(xp,yp,zp));
+
+            
+            //not totally sure this is right 
+            //int num_pul_x = (mag*pp_lux)*abs(delta_x);
+            //int num_pul_y = (mag*pp_luy)*abs(delta_y);
+            //int num_pul_z = (mag*pp_luz)*abs(delta_z);            
+            int num_pul_x = pp_lux*abs(delta_x);
+            int num_pul_y = pp_luy*abs(delta_y);
+            int num_pul_z = pp_luz*abs(delta_z); 
+
+            if (debug)
+                cout << "# num pulses " << num_pul_x <<" "<<num_pul_y<<" "<<num_pul_z <<"\n";
+
+            // get the absolute highest number of pulses (on any axis) to calculate 
+            int tmp[] = {num_pul_x, num_pul_y, num_pul_z};
+            //cout << "before: "<<tmp[0] << " "<< tmp[1] <<" "<< tmp[2] <<"\n";
+            std::sort(std::begin(tmp), std::end(tmp)  );
+            //cout << "after: "<<tmp[0] << " "<< tmp[1] <<" "<< tmp[2] <<"\n";
+            int most = tmp[2];
+              
+
+            ////////////////////////////////////              
+            // test of simpler calc
+            ////////////////////////////////////
+            if (debug)
+            {            
+                cout << "# most   " << most << " "<< numdivs << " " <<"\n";  
+                cout << "# numpts " << num_pul_x <<" " << num_pul_y <<" " << num_pul_z <<"\n"; 
+                cout << "#####\n";
+            }
+
+
+            cnc_plot plot;
+
+            vector<int> calcpt_x;
+            vector<int> calcpt_y;
+            vector<int> calcpt_z;
+                       
+                                   
+            plot.gen_pules(&calcpt_x, most, num_pul_x);  
+            plot.gen_pules(&calcpt_y, most, num_pul_y);  
+            plot.gen_pules(&calcpt_z, most, num_pul_z);  
+
+            int a=0;
+            for(a=0;a<most;a++)
+            {
+                //cout << calcpt_x.at(a)<<" " << "\n";
+                pt_pulsetrain->push_back(newvec3(calcpt_x.at(a), calcpt_y.at(a), calcpt_z.at(a)));
+                pt_pulsetrain->push_back(newvec3(0,0,0));
+
+            }
+
+
+
+            
+
+} 
+
+
+/******************************************/
+
+/*
+
+void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
+                              vec3 fr_pt, 
+                              vec3 to_pt,
+                              int numdivs)
+{
+
+            bool debug = false;
+
+            pointgen PG;
+
+            //set the pulses per linear unit (spatial unit divions) - X,Y,Z unit prescaler 
+            //for now use one number for all 3 - we will add the others in later
+            // int pp_lux      = 10;
+            // int pp_luy      = 10;
+            // int pp_luz      = 10;
+            int pp_lux      = numdivs;
+            int pp_luy      = numdivs;
+            int pp_luz      = numdivs;
+
+
+            //make some storage for the data to work in 
+            vector<vec3> x_pts;
+            vector<vec3> y_pts;
+            vector<vec3> z_pts;
+            vector<vec3> samples;
+
+            //make some pointers to those data.
+            //(people who say THOSE data are technically correct, but they are pedantic dillholes) 
+            vector<vec3>* pt_xpts    = &x_pts;
+            vector<vec3>* pt_ypts    = &y_pts;
+            vector<vec3>* pt_zpts    = &z_pts;
+            vector<vec3>* pt_samples = &samples;
+
+
+            //set up variables to do vector-y stuff
+            vec3 between   = sub(fr_pt, to_pt);
+            double mag     = length(between);
             double gran    = 0;  //granularity 
             double thresh  = 0;  //threshold 
             //cout << mag <<"\n";
@@ -327,6 +539,8 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
                 
                 PG.locate_pt_along3d(pt_samples, to_pt, fr_pt, most);
                 
+                //DEBUG this "works" but does not distribute the pulses properly due to the 3 loops in a loop
+                //the pulses should be evenly spaced across the entirety, and this makes clumps of pulses 
                 int a=0;int i=0;
                 for(a=0;a<samples.size();a++)
                 {
@@ -384,14 +598,5 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
 
 }
 
-/******************************************/
-
-
-
- 
-
-
-
-
-
+*/
 
