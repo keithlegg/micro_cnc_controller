@@ -18,27 +18,14 @@
 #include "point_op.h"
 
 
-//µs (microsecond) duration between pulses 
-//gecko docs say minimun pulse with is 2.5µs per pulse - seems way too fast for me 
+// µs (microsecond) duration between pulses 
+// gecko docs say minimun pulse with is 2.5µs per pulse - seems way too fast for me 
 int pulse_del = 1000;
 
-
-/*
-double xpos = 0;
-double ypos = 0;
-double zpos = 0;
-*/
 
 
 #define LPT1 0xc010
 //#define LPT1 0x0378
-
-
-
-/******************************************/
-//void cnc_plot::gen_3d_pules(vector<vec3>* pt_pulsetrain, int size, int num)
-//{
-//}
       
 
 /******************************************/
@@ -47,7 +34,7 @@ void cnc_plot::gen_pules(vector<int>* pt_pulsetrain, int size, int num)
     
     if(num>size)
     {
-        cout << "# gen_pules: size arg may not excede number \n";
+        cout << "# gen_pules: size arg may not exceed number \n";
 
         exit(1);
     }
@@ -57,7 +44,7 @@ void cnc_plot::gen_pules(vector<int>* pt_pulsetrain, int size, int num)
 
     int a;  
 
-    //if zero make all zeros
+    //if zero make all zeros, we want the output to be the same size
     if(num==0)
     {
         for(a=0;a<size;a++)
@@ -66,7 +53,7 @@ void cnc_plot::gen_pules(vector<int>* pt_pulsetrain, int size, int num)
         }
     }
 
-    //exception for integer 1 
+    //exception for integer 1, put the pulse right in the middle of output 
     if(num==1)
     {
         for(a=0;a<size;a++)
@@ -74,35 +61,28 @@ void cnc_plot::gen_pules(vector<int>* pt_pulsetrain, int size, int num)
 
             if( a == size/2)
             {
-                //cout <<"1\n";
                 pt_pulsetrain->push_back(1);
             }else  
             {
-                //cout <<"0\n";
                 pt_pulsetrain->push_back(0);
             } 
 
         }
     }
 
-    //all else 
-    if(num>1)
+    // build a pulse waveform, spread it out as evenly as possible over the entirety of the data 
+    // I did a true 3D solution (commented out at bottom) but this is way faster and works as far as I can tell
+    if(num>1) 
     {
         for(a=0;a<size;a++)
         {
             double chunk = fmod(a,div);
-            //cout << chunk  <<" "<< gran <<" "<<fmod(chunk,gran) <<"\n";
-            //cout << "# # "<<chunk << "\n";
             if( chunk < 1)
             {
-                //cout <<"1\n";
-                //cout <<"0\n";
                 pt_pulsetrain->push_back(1);
-                //pt_pulsetrain->push_back(0);                
             }
             if( chunk > 1)
             {
-                //cout <<"0\n";
                 pt_pulsetrain->push_back(0);                   
             } 
             if ( chunk==1){
@@ -116,15 +96,6 @@ void cnc_plot::gen_pules(vector<int>* pt_pulsetrain, int size, int num)
 
 
 /******************************************/
-/*
-std::vector<int> my_sort(const std::vector<int>& v) {
-      auto result = v; // passing v by value and returning it defeats NRVO
-      std::sort(result.begin(), result.end());
-      return result;
-}
-*/
-
-
 
 void cnc_plot::test_port(void)
 {
@@ -164,14 +135,14 @@ void cnc_plot::test_port(void)
     
 
 
-    DB25 PINOUT (using the CNC4PC/LinuxCNC board as my "defualt")
+    DB25 PINOUT (using the CNC4PC/LinuxCNC board as my "default")
 
-    2- X pulse    0x01   (1<<0) 
-    3- X dir      0x02   (1<<1)
-    4- Y pulse    0x04   (1<<2)
-    5- Y dir      0x08   (1<<3)
-    6- Z pulse    0x10   (1<<4)
-    7- Z dir      0x20   (1<<5)
+    db25 pin #2 - X pulse  -  address 0x01  -  bitshift (1<<0) 
+    db25 pin #3 - X dir    -  address 0x02  -  bitshift (1<<1)
+    db25 pin #4 - Y pulse  -  address 0x04  -  bitshift (1<<2)
+    db25 pin #5 - Y dir    -  address 0x08  -  bitshift (1<<3)
+    db25 pin #6 - Z pulse  -  address 0x10  -  bitshift (1<<4)
+    db25 pin #7 - Z dir    -  address 0x20  -  bitshift (1<<5)
 
 
 
@@ -236,7 +207,9 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
 
     //**************************//
     int x=0;
-    //intentionally skipping over the first
+
+    //the first element is reserved for direction data 
+    //we intentionally skip it starting at index 1 
     for(x=1;x<pt_pulsetrain->size();x++)
     {
         if(send_it==0)
@@ -360,11 +333,8 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
             //first element of pulse train stores the direction 
             pt_pulsetrain->push_back(newvec3(xp,yp,zp));
 
-            
-            //not totally sure this is right 
-            //int num_pul_x = (mag*pp_lux)*abs(delta_x);
-            //int num_pul_y = (mag*pp_luy)*abs(delta_y);
-            //int num_pul_z = (mag*pp_luz)*abs(delta_z);            
+            //use the amount of change times the spatial divions to get the pulses 
+            //DEBUG - we may want to use the mag of the 3d vector in here                  
             int num_pul_x = pp_lux*abs(delta_x);
             int num_pul_y = pp_luy*abs(delta_y);
             int num_pul_z = pp_luz*abs(delta_z); 
@@ -381,8 +351,6 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
               
 
             ////////////////////////////////////              
-            // test of simpler calc
-            ////////////////////////////////////
             if (debug)
             {            
                 cout << "# most   " << most << " "<< numdivs << " " <<"\n";  
@@ -390,14 +358,14 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
                 cout << "#####\n";
             }
 
-
             cnc_plot plot;
 
             vector<int> calcpt_x;
             vector<int> calcpt_y;
             vector<int> calcpt_z;
                        
-                                   
+            // just calc the pulses using a ratio of length to divs. 
+            // I experimented with a true 3D method below but this seems to work fine (?)                       
             plot.gen_pules(&calcpt_x, most, num_pul_x);  
             plot.gen_pules(&calcpt_y, most, num_pul_y);  
             plot.gen_pules(&calcpt_z, most, num_pul_z);  
@@ -405,19 +373,15 @@ void cnc_plot::calc_3d_pulses(vector<vec3>* pt_pulsetrain,
             int a=0;
             for(a=0;a<most;a++)
             {
-                //cout << calcpt_x.at(a)<<" " << "\n";
                 pt_pulsetrain->push_back(newvec3(calcpt_x.at(a), calcpt_y.at(a), calcpt_z.at(a)));
                 pt_pulsetrain->push_back(newvec3(0,0,0));
-
             }
-
-
-
             
 
 } 
 
 
+/******************************************/
 /******************************************/
 
 /*
