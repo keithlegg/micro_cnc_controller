@@ -1,36 +1,22 @@
 # micro_cnc_controller
 
 
-This was prototyped in a single weekend! 
+This started out as a printer port testing tool. Then I wondered what would be involved to make it drive 3 servo motors with STEP/DIR.
 
-I drank too much coffee and wanted to make a simple tool to control a CNC/3D printer/Laser cutter.
-
-Give it 2 3d points and it tells a servo/stepper how to get from one location to the other. 
-
-I challenge you to come up with a simpler method of controlling a 3 Axis machine. 
-
-
+Not a working tool, but it is a good start to mockup a CNC controller.
 
 The "build" folder contains the C source code and everything you need to make it. 
-
 The "py" folder contains the python code I used to prototype the tool, and examples to run it. 
 
 
-
-TODO:
-  
-  The bits on the port will correspond to the CNC4PC breakout board pin assignment (and "standard" LinuxCNC).
-  I enojoy using this board because its rleatively cheap and works well. You can certainly make your own interface or use others, I just did it this way because I had it on hand.
-
-  It gets exponentially slower for long distances with large numbers of divisions. 
-  To optimize it would be easy to insert extra pulses between the pulses. 
-
-
-PINOUT of CNC4PC DB25:
+Follows the pinout of the "CNC4PC" interface board:
 
     Bidirectional pins 2-9
     Output pins        1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 16, 17. Or 1, 14, 16, 17
     Input pins         10, 11, 12, 13, 15. Or 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15
+
+
+Does not support any inputs at this time. 
 
 
 
