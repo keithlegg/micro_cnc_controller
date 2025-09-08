@@ -131,9 +131,8 @@ void cnc_plot::test_port(void)
 /*
     take the output of calc_3d_pulses() and send the signals to the parallel port 
     
-    The first electent of the array denotes direction pulses
+    The first elemtent of the array denotes direction pulses
     
-
 
     DB25 PINOUT (using the CNC4PC/LinuxCNC board as my "default")
 
@@ -143,6 +142,10 @@ void cnc_plot::test_port(void)
     db25 pin #5 - Y dir    -  address 0x08  -  bitshift (1<<3)
     db25 pin #6 - Z pulse  -  address 0x10  -  bitshift (1<<4)
     db25 pin #7 - Z dir    -  address 0x20  -  bitshift (1<<5)
+
+
+    #optional pulses
+    db25 pin #8 - INV Y pulse   -  address 0x40  -  bitshift (1<<6)
 
 
 
@@ -184,6 +187,8 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
             outb(send_byte, LPT1);               
         }
 
+        /*****/
+
         //y direction high 
         if (dirpulses.y>1){
             send_byte = send_byte |= (1 << 3);
@@ -194,6 +199,28 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
             outb(send_byte, LPT1);               
         }
 
+
+        /*****/
+        //THIS IS A 2D GANTRY machine - inverts the Z axis for the second Y motor  
+
+        //z direction high 
+        if (dirpulses.y>1){
+            // send_byte = send_byte |= (1 << 5);
+            // outb(send_byte, LPT1);   
+            send_byte = send_byte &= ~(1 << 5);   
+            outb(send_byte, LPT1); 
+        }else{
+            send_byte = send_byte |= (1 << 5);
+            outb(send_byte, LPT1);  
+            //send_byte = send_byte &= ~(1 << 5);   
+            //outb(send_byte, LPT1);                   
+        }
+
+
+        /*****/
+        //THIS IS A STANDARD 3D SETUP USING Z AXIS
+
+        /* 
         //z direction high 
         if (dirpulses.z>1){
             send_byte = send_byte |= (1 << 5);
@@ -202,6 +229,13 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
             send_byte = send_byte &= ~(1 << 5);   
             outb(send_byte, LPT1);                   
         }
+        
+        */
+        
+
+
+
+
     }
 
 
