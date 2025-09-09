@@ -192,34 +192,30 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
         //y direction high 
         if (dirpulses.y>1){
             send_byte = send_byte |= (1 << 3);
-            outb(send_byte, LPT1);               
+            outb(send_byte, LPT1);  
+            
+            //!! THIS IS EXTRA FOR A GANTRY MACHINE INVERTED Z AXIS
+            send_byte = send_byte &= ~(1 << 5);   
+            outb(send_byte, LPT1); 
+
         }else{
             //y direction low         
             send_byte = send_byte &= ~(1 << 3);
-            outb(send_byte, LPT1);               
-        }
+            outb(send_byte, LPT1);   
 
-
-        /*****/
-        //THIS IS A 2D GANTRY machine - inverts the Z axis for the second Y motor  
-
-        //z direction high 
-        if (dirpulses.y>1){
-            // send_byte = send_byte |= (1 << 5);
-            // outb(send_byte, LPT1);   
-            send_byte = send_byte &= ~(1 << 5);   
-            outb(send_byte, LPT1); 
-        }else{
+            //!! THIS IS EXTRA FOR A GANTRY MACHINE INVERTED Z AXIS
             send_byte = send_byte |= (1 << 5);
-            outb(send_byte, LPT1);  
-            //send_byte = send_byte &= ~(1 << 5);   
-            //outb(send_byte, LPT1);                   
+            outb(send_byte, LPT1);                          
+
         }
+
+
 
 
         /*****/
         //THIS IS A STANDARD 3D SETUP USING Z AXIS
-
+        //DISABLED BECAUSE WE ARE USING THIS ACIX FOR A GANTRY
+        //IN THE Y AXIS LOOP ABOVE  
         /* 
         //z direction high 
         if (dirpulses.z>1){
@@ -266,12 +262,22 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
             if(pt_pulsetrain->at(x).y==1){
                 send_byte = send_byte |= (1 << 2);
                 outb(send_byte, LPT1);    
+
+                //!! THIS IS ALSO RUNNING Z AXIS (INVERTED DIR) FOR A GANTRY 
+                send_byte = send_byte |= (1 << 4);
+                outb(send_byte, LPT1);    
+
             }else{
                 send_byte = send_byte &= ~(1 << 2);
-                outb(send_byte, LPT1);                
+                outb(send_byte, LPT1);           
+
+                //!! THIS IS ALSO RUNNING Z AXIS (INVERTED DIR) FOR A GANTRY 
+                send_byte = send_byte &= ~(1 << 4);
+                outb(send_byte, LPT1);                    
             }
 
-            //Z channel
+            /*  
+            //standard Z channel
             if(pt_pulsetrain->at(x).z==1){
                 send_byte = send_byte |= (1 << 4);
                 outb(send_byte, LPT1);   
@@ -279,6 +285,8 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
                 send_byte = send_byte &= ~(1 << 4);
                 outb(send_byte, LPT1);                 
             }
+            */
+
 
             usleep(pulse_del); 
         }
