@@ -127,6 +127,18 @@ void cnc_plot::test_port(void)
 
 }
 
+
+
+
+/******************************************/
+void read_limits(vector<vec3>* pt_limit_switch_data)
+{
+
+
+
+}
+
+
 /******************************************/
 /*
     take the output of calc_3d_pulses() and send the signals to the parallel port 

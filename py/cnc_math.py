@@ -5,11 +5,7 @@ import os
 
 simplest possible CNC control written in pure pyhton. 
 
-All vectors are assumed to have 3 elements. 
-
-
 code is derived from gnelscript.math_ops library - Keith Legg 2018-2025
-
 
 """
 
