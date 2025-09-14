@@ -158,7 +158,7 @@ void cnc_plot::read_limits(vector<vec3>* pt_limit_switch_data)
 
     unsigned char pin_10_mask = 0b11000000;
     unsigned char pin_12_mask = 0b10100000;
-    unsigned char pin_13_mask = 0b10010000;
+    unsigned char pin_13_mask = 0b00010000;
 
     unsigned char data_read;
     data_read = inb(LPT1+1); 
@@ -170,12 +170,12 @@ void cnc_plot::read_limits(vector<vec3>* pt_limit_switch_data)
         cout << "pin number 10 \n";  
     };
 
-    if ((data_read==pin_12_mask)==pin_12_mask)
+    if ((data_read & pin_12_mask)==pin_12_mask)
     {
         cout << "pin number 12 \n";  
     };
 
-    if ((data_read==pin_13_mask)==pin_13_mask)
+    if ((data_read & pin_13_mask)==pin_13_mask)
     {
         cout << "pin number 13 \n";  
     };
