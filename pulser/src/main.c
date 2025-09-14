@@ -87,13 +87,15 @@ void parse_args(int argc, char **argv)
 int main(int argc, char **argv) 
 {  
     
-    // parse_args(argc, argv); 
+    parse_args(argc, argv); 
     
-
+    
+    /*
     //test of limit switch reading 
     cnc_plot plot;
     vec3 foo;
     plot.read_limits(&foo);
+    */
 
 
     /*

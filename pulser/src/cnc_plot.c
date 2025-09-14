@@ -169,18 +169,21 @@ void cnc_plot::read_limits(vec3* pt_limit_switch_data)
     if ((data_read & pin_10_mask)==pin_10_mask)
     {
         cout << "X limit triggered (p10) \n";  
+        pt_limit_switch_data->x =1;
     };
 
     //Z
     if ((data_read & pin_12_mask)==pin_12_mask)
     {
         cout << "Z limit triggered (p12) \n";  
+        pt_limit_switch_data->z =1;
     };
 
     //Y 
     if ((data_read & pin_13_mask)==pin_13_mask)
     {
         cout << "Y limit triggered (p13) \n";  
+        pt_limit_switch_data->y =1;        
     };
 
 
@@ -391,49 +394,56 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
 
         if(send_it==1)
         {
-        
-
-            //watch the limit switches - if triggered, switch off motors NOW!
-            (*this).read_limits(&limit_switches);
-
-
-            //X channel 
-            if(pt_pulsetrain->at(x).x==1){
-                send_byte = send_byte |= (1 << 0);
-                outb(send_byte, LPT1); 
-            }else{
-                send_byte = send_byte &= ~ (1 << 0);
-                outb(send_byte, LPT1);  
-            }
-                
-            //Y channel
-            if(pt_pulsetrain->at(x).y==1){
-                send_byte = send_byte |= (1 << 2);
-                outb(send_byte, LPT1);    
-
-                //!! THIS IS ALSO RUNNING Z AXIS (INVERTED DIR) FOR A GANTRY 
-                //send_byte = send_byte |= (1 << 4);
-                //outb(send_byte, LPT1);    
-
-            }else{
-                send_byte = send_byte &= ~(1 << 2);
-                outb(send_byte, LPT1);           
-
-                //!! THIS IS ALSO RUNNING Z AXIS (INVERTED DIR) FOR A GANTRY 
-                //send_byte = send_byte &= ~(1 << 4);
-                //outb(send_byte, LPT1);                    
-            }
-
-              
-            //standard Z channel
-            if(pt_pulsetrain->at(x).z==1){
-                send_byte = send_byte |= (1 << 4);
-                outb(send_byte, LPT1);   
-            }else{
-                send_byte = send_byte &= ~(1 << 4);
-                outb(send_byte, LPT1);                 
-            }
             
+            // watch the limit switches - if triggered, switch off motors NOW!
+            (*this).read_limits(&limit_switches);
+            
+            if(limit_switches.x==1 || limit_switches.y==1 || limit_switches.z==1){
+                cout << "machine has crashed. Condolences. pulsing aborted. ";
+            }
+            else
+            {
+                //X channel 
+                if(pt_pulsetrain->at(x).x==1){
+                    send_byte = send_byte |= (1 << 0);
+                    outb(send_byte, LPT1); 
+                }else{
+                    send_byte = send_byte &= ~ (1 << 0);
+                    outb(send_byte, LPT1);  
+                }
+                    
+                //Y channel
+                if(pt_pulsetrain->at(x).y==1){
+                    send_byte = send_byte |= (1 << 2);
+                    outb(send_byte, LPT1);    
+
+                    //!! THIS IS ALSO RUNNING Z AXIS (INVERTED DIR) FOR A GANTRY 
+                    //send_byte = send_byte |= (1 << 4);
+                    //outb(send_byte, LPT1);    
+
+                }else{
+                    send_byte = send_byte &= ~(1 << 2);
+                    outb(send_byte, LPT1);           
+
+                    //!! THIS IS ALSO RUNNING Z AXIS (INVERTED DIR) FOR A GANTRY 
+                    //send_byte = send_byte &= ~(1 << 4);
+                    //outb(send_byte, LPT1);                    
+                }
+
+                  
+                //standard Z channel
+                if(pt_pulsetrain->at(x).z==1){
+                    send_byte = send_byte |= (1 << 4);
+                    outb(send_byte, LPT1);   
+                }else{
+                    send_byte = send_byte &= ~(1 << 4);
+                    outb(send_byte, LPT1);                 
+                }
+            
+
+            }
+
+
 
 
             usleep(pulse_del); 
