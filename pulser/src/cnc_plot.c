@@ -147,7 +147,7 @@ void cnc_plot::test_port(void)
                             
 */
 
-void cnc_plot::read_limits(vector<vec3>* pt_limit_switch_data)
+void cnc_plot::read_limits(vec3* pt_limit_switch_data)
 {
 
     if(ioperm(LPT1+1,1,1))
@@ -165,19 +165,22 @@ void cnc_plot::read_limits(vector<vec3>* pt_limit_switch_data)
     
     //printf("Data read from parallel port: 0x%x\n", data_read);
 
+    //X
     if ((data_read & pin_10_mask)==pin_10_mask)
     {
-        cout << "pin number 10 \n";  
+        cout << "X limit triggered (p10) \n";  
     };
 
+    //Z
     if ((data_read & pin_12_mask)==pin_12_mask)
     {
-        cout << "pin number 12 \n";  
+        cout << "Z limit triggered (p12) \n";  
     };
 
+    //Y 
     if ((data_read & pin_13_mask)==pin_13_mask)
     {
-        cout << "pin number 13 \n";  
+        cout << "Y limit triggered (p13) \n";  
     };
 
 
@@ -307,13 +310,17 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
 
     //**************************//
     vec3 dirpulses = pt_pulsetrain->at(0);
+    
+    vec3 limit_switches;
+
+
     if(send_it==0)
     {
         cout <<"# debug - direction "<< dirpulses.x<<" " << dirpulses.y<<" " << dirpulses.z <<"\n";
     }
 
     if(send_it==1)
-    {    
+    {   
         //x direction high 
         if (dirpulses.x>1){
             //outb(0x02, LPT1);
@@ -376,6 +383,7 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
     //we intentionally skip it starting at index 1 
     for(x=1;x<pt_pulsetrain->size();x++)
     {
+
         if(send_it==0)
         {
             cout<< pt_pulsetrain->at(x).x<<" " << pt_pulsetrain->at(x).y<<" " << pt_pulsetrain->at(x).z <<"\n";
@@ -383,6 +391,12 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
 
         if(send_it==1)
         {
+        
+
+            //watch the limit switches - if triggered, switch off motors NOW!
+            (*this).read_limits(&limit_switches);
+
+
             //X channel 
             if(pt_pulsetrain->at(x).x==1){
                 send_byte = send_byte |= (1 << 0);

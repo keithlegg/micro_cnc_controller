@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 
     //test of limit switch reading 
     cnc_plot plot;
-    vector<vec3> foo;
+    vec3 foo;
     plot.read_limits(&foo);
 
 
