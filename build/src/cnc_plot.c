@@ -131,9 +131,90 @@ void cnc_plot::test_port(void)
 
 
 /******************************************/
-void read_limits(vector<vec3>* pt_limit_switch_data)
+//read the parallel port inputs to make sure we didnt crash the machine 
+void cnc_plot::read_limits(vector<vec3>* pt_limit_switch_data)
 {
 
+
+}
+
+
+/******************************************/
+
+
+
+
+void cnc_plot::load_config_file(char* filepath)
+{
+
+    /*  
+    printf("#loading setup file %s \n", filepath );
+    
+    FILE * fp;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    fp = fopen(filepath, "r");
+    if (fp == NULL)
+        exit(EXIT_FAILURE);
+
+    obj_filepaths.clear();
+    float vx,vy,vz,cr,cg,cb = 0;
+
+    // walk the file line by line
+    while ((read = getline(&line, &len, fp)) != -1) 
+    {
+
+        char cmd_str[256]; // string that verts get copied to 
+        
+        // walk the line, token by token  
+        char* tok_spacs = strtok(line, " ");
+        while (tok_spacs) 
+        {
+            //------------------------------- 
+            if ( strcmp( tok_spacs, "tcp_port") == 0)
+            {
+                strcpy (cmd_str, line);
+                char* tok_line = strtok(0, " ");
+                int tidx = 0;
+                while (tok_line) 
+                {
+                    if(tidx==0){TCP_PORT = atoi(tok_line);}
+                    tidx++;                                        
+                    tok_line = strtok(NULL, " \t\n");      
+
+                }
+                printf("TCP PORT SET TO %u \n", TCP_PORT );
+            }
+
+            //-------------------------------             
+            if ( strcmp( tok_spacs, "show_lines") == 0)
+            {
+                strcpy (cmd_str, line);
+
+                //walk the tokens on the line (a copy of it)
+                char* tok_line = strtok(NULL, " \t\n");
+                
+                int tidx = 0;
+                while (tok_line) 
+                {
+                    char* check_token = strtok(NULL, " \t\n");
+                    if(strcmp( tok_line, "true")==0)
+                    {
+                        draw_lines = true;
+                    }else{
+                        draw_lines = false;                        
+                        printf("# draw lines %s\n", draw_lines ? "true" : "false");
+                    }
+                                                          
+                    tok_line = strtok(NULL, " \t\n");
+
+                }
+          
+            }
+
+            */
 
 
 }
@@ -207,8 +288,8 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
             outb(send_byte, LPT1);  
             
             //!! THIS IS EXTRA FOR A GANTRY MACHINE INVERTED Z AXIS
-            send_byte = send_byte &= ~(1 << 5);   
-            outb(send_byte, LPT1); 
+            //send_byte = send_byte &= ~(1 << 5);   
+            //outb(send_byte, LPT1); 
 
         }else{
             //y direction low         
@@ -216,19 +297,16 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
             outb(send_byte, LPT1);   
 
             //!! THIS IS EXTRA FOR A GANTRY MACHINE INVERTED Z AXIS
-            send_byte = send_byte |= (1 << 5);
-            outb(send_byte, LPT1);                          
+            //send_byte = send_byte |= (1 << 5);
+            //outb(send_byte, LPT1);                          
 
         }
 
 
-
-
         /*****/
         //THIS IS A STANDARD 3D SETUP USING Z AXIS
-        //DISABLED BECAUSE WE ARE USING THIS ACIX FOR A GANTRY
-        //IN THE Y AXIS LOOP ABOVE  
-        /* 
+
+
         //z direction high 
         if (dirpulses.z>1){
             send_byte = send_byte |= (1 << 5);
@@ -238,7 +316,7 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
             outb(send_byte, LPT1);                   
         }
         
-        */
+        
         
 
 

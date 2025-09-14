@@ -86,7 +86,14 @@ void parse_args(int argc, char **argv)
 
 int main(int argc, char **argv) 
 {  
+    
     parse_args(argc, argv); 
+    
+
+    // cnc_plot plot;
+    // plot.load_config_file("testcfg.txt");
+
+
     return 0;
 }
 

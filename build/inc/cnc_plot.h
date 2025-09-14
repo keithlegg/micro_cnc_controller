@@ -27,6 +27,9 @@ class cnc_plot
                         vec3,
                         int);
 
+
+    void load_config_file(char*);
+
     void send_pulses(vector<vec3>*);
     void read_limits(vector<vec3>*);
 
