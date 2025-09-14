@@ -8,7 +8,7 @@ What it does so far:
 
 It takes two 3D points and calculates the differecne FROM a point TO a point (a 3D vector.)
 It then breaks that vector into 3 sets of STEP and DIRection pulses and sends them out a parallel port. 
-It also reads three inputs (X,Y,Z) - watching for limit switches and disbles the pulses if it detects a crash.
+It also reads three inputs (X,Y,Z) - watching for limit switches and disables the pulses if it detects a crash.
 
 For now, thats it. 
 
@@ -17,7 +17,7 @@ I am in the process of building a textfile configuration tool, beacuse the numbe
 I will be adding an AUX output pin to turn things off and on, like say a spindle of filament extruder ;)
 
 
-This is not a complete CNC controller itself, it does not even track position in space beyond local transactinoal movements.
+This is not a complete CNC controller itself, it does not even track position in space beyond local single transactional movements.
 BUT you can build on it as a library or call it from python and do the control logic over there.
 
 

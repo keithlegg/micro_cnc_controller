@@ -18,6 +18,9 @@ class cnc_plot
 
     void test_port(void);
 
+    void aux_on(unsigned int);
+    void aux_off(unsigned int);
+
     void gen_pules(vector<int>*, int, int);
 
     void gen_3d_pules(vector<vec3>*, int, int);

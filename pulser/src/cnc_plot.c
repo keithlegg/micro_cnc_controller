@@ -26,7 +26,44 @@ int pulse_del = 1000;
 
 #define LPT1 0xc010
 //#define LPT1 0x0378
-      
+
+
+
+/******************************************/
+void cnc_plot::aux_on(unsigned int pin)
+{
+    if(ioperm(LPT1,1,1))
+    { 
+        fprintf(stderr, "# Couldn't open parallel port \n"), exit(1);
+    
+    }
+
+    unsigned char data_read;
+    data_read = inb(LPT1);
+    data_read = data_read |= (1 << pin);
+    outb(data_read, LPT1);            
+
+
+}
+
+
+
+/******************************************/
+void cnc_plot::aux_off(unsigned int pin)
+{
+    if(ioperm(LPT1,1,1))
+    { 
+        fprintf(stderr, "# Couldn't open parallel port \n"), exit(1);
+    
+    }
+
+    unsigned char data_read;
+    data_read = inb(LPT1);
+    data_read = data_read &= ~(1 << pin);
+    outb(data_read, LPT1);    
+
+}
+
 
 /******************************************/
 void cnc_plot::gen_pules(vector<int>* pt_pulsetrain, int size, int num)
