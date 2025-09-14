@@ -306,7 +306,6 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
         /*****/
         //THIS IS A STANDARD 3D SETUP USING Z AXIS
 
-
         //z direction high 
         if (dirpulses.z>1){
             send_byte = send_byte |= (1 << 5);
@@ -354,19 +353,19 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
                 outb(send_byte, LPT1);    
 
                 //!! THIS IS ALSO RUNNING Z AXIS (INVERTED DIR) FOR A GANTRY 
-                send_byte = send_byte |= (1 << 4);
-                outb(send_byte, LPT1);    
+                //send_byte = send_byte |= (1 << 4);
+                //outb(send_byte, LPT1);    
 
             }else{
                 send_byte = send_byte &= ~(1 << 2);
                 outb(send_byte, LPT1);           
 
                 //!! THIS IS ALSO RUNNING Z AXIS (INVERTED DIR) FOR A GANTRY 
-                send_byte = send_byte &= ~(1 << 4);
-                outb(send_byte, LPT1);                    
+                //send_byte = send_byte &= ~(1 << 4);
+                //outb(send_byte, LPT1);                    
             }
 
-            /*  
+              
             //standard Z channel
             if(pt_pulsetrain->at(x).z==1){
                 send_byte = send_byte |= (1 << 4);
@@ -375,7 +374,7 @@ void cnc_plot::send_pulses(vector<vec3>* pt_pulsetrain)
                 send_byte = send_byte &= ~(1 << 4);
                 outb(send_byte, LPT1);                 
             }
-            */
+            
 
 
             usleep(pulse_del); 
