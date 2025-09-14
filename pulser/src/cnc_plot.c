@@ -131,20 +131,73 @@ void cnc_plot::test_port(void)
 
 
 /******************************************/
-//read the parallel port inputs to make sure we didnt crash the machine 
+/*
+       Read the parallel port inputs to make sure we didnt crash the machine 
+
+       Data State: 
+
+       All pins pulled down  == 0x08 - 00001000
+       ACK       - pin 10 - 0xc0     - 11000000
+       BUSY      - pin 11 - 0x0      - 00000000 (active high)
+       PAPER OUT - pin 12 - 0xa0     - 10100000
+       SELECT    - pin 13 - 0x80     - 10000000
+       LINE FEED - pin 14 - 0x88     - 10001000 (active high)
+       ERROR     - pin 15 - 0x90     - 10010000
+
+                            
+*/
+
 void cnc_plot::read_limits(vector<vec3>* pt_limit_switch_data)
 {
 
-    if(ioperm(LPT1,1,1))
+    if(ioperm(LPT1+1,1,1))
     { 
         fprintf(stderr, "# Couldn't open parallel port \n"), exit(1);
     
     }
 
     unsigned char data_read;
+    data_read = inb(LPT1+1); 
+    //printf("Data read from parallel port: 0x%x\n", data_read);
+    
+    if(data_read==0x08)
+    {
+        cout << "all pins off \n"; 
+    }
 
-    data_read = inb(LPT1); 
-    printf("Data read from parallel port: 0x%x\n", data_read);
+    if(data_read==0xc0)
+    {
+        cout << "pin number 10 \n";    
+    };
+
+    if(data_read==0x00)
+    {
+        cout << "pin number 11 \n";  
+    };
+
+    if(data_read==0xa0)
+    {
+        cout << "pin number 12 \n";  
+    };
+
+    if(data_read==0x80)
+    {
+        cout << "pin number 13 \n";  
+    };
+
+    if(data_read==0x88)
+    {
+        cout << "pin number 14 \n";  
+    };
+
+    if(data_read==0x90)
+    {
+        cout << "pin number 15 \n";  
+    };
+                
+
+
+
 
 }
 
