@@ -135,6 +135,16 @@ void cnc_plot::test_port(void)
 void cnc_plot::read_limits(vector<vec3>* pt_limit_switch_data)
 {
 
+    if(ioperm(LPT1,1,1))
+    { 
+        fprintf(stderr, "# Couldn't open parallel port \n"), exit(1);
+    
+    }
+
+    unsigned char data_read;
+
+    data_read = inb(LPT1); 
+    printf("Data read from parallel port: 0x%x\n", data_read);
 
 }
 

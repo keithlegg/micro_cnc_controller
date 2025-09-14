@@ -1,10 +1,9 @@
-TARGET   = pulser
+TARGET   = homer
 
-
-INCDIR   =inc
-SRCDIR   =src
-OBJDIR   =obj
-BINDIR   =bin
+INCDIR   = inc
+SRCDIR   = src
+OBJDIR   = obj
+BINDIR   = bin
 
 
 #CC       = g++ -D_ISLINUX 
