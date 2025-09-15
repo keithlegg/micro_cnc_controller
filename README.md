@@ -6,7 +6,7 @@ This started out as a printer port testing tool. Then I wondered what would be i
 
 What it does so far:
 
-It takes two 3D points and calculates the differecne FROM a point TO a point (a 3D vector.)
+It takes two 3D points and calculates the difference FROM a point TO a point (a 3D vector.)
 It then breaks that vector into 3 sets of STEP and DIRection pulses and sends them out a parallel port. 
 It also reads three inputs (X,Y,Z) - watching for limit switches and disables the pulses if it detects a crash.
 
